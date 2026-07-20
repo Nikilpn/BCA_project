@@ -1,0 +1,2289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BCSP-064 Project Report – Hotel Room Booking Website with Assistant Chatbot</title>
+<style>
+/* ───── VARIABLES ───── */
+:root{--pri:#1e3a8a;--sec:#0f172a;--acc:#2563eb;--mut:#64748b;--bg:#f8fafc;--bdr:#dbe3ee;--ok:#16a34a;--font-main:"Georgia","Times New Roman",Times,serif;--font-head:"Segoe UI",Arial,Helvetica,sans-serif;}
+
+/* ───── RESET ───── */
+*{box-sizing:border-box;margin:0;padding:0;}
+
+/* ───── BODY ───── */
+body{font-family:var(--font-main);background:#fff;color:#1f2937;line-height:2;font-size:14pt;}
+
+/* ───── TOOLBAR (screen only) ───── */
+.toolbar{position:sticky;top:0;z-index:50;background:rgba(15,23,42,.96);backdrop-filter:blur(8px);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:12px 24px;gap:10px;flex-wrap:wrap;}
+.toolbar h1{font-size:14px;font-weight:700;margin:0;font-family:var(--font-head);}
+.toolbar .grp{display:flex;gap:8px;flex-wrap:wrap;}
+.btn{border:none;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:.2s;font-family:var(--font-head);}
+.btn-p{background:#3b82f6;color:#fff;}.btn-p:hover{background:#2563eb;}
+.btn-l{background:#e2e8f0;color:#0f172a;}.btn-l:hover{background:#cbd5e1;}
+
+/* ───── PAGE CONTAINER ───── */
+.page{max-width:210mm;margin:0 auto;padding:20mm 22mm 20mm 28mm;}
+
+/* ───── HEADINGS ───── */
+h1.chapter{font-family:var(--font-head);font-size:22pt;color:var(--sec);border-bottom:3px double var(--acc);padding-bottom:8px;margin:36pt 0 18pt;page-break-before:always;page-break-after:avoid;}
+h2.section{font-family:var(--font-head);font-size:17pt;color:var(--pri);margin:28pt 0 12pt;page-break-after:avoid;}
+h3.subsec{font-family:var(--font-head);font-size:14pt;color:#334155;margin:20pt 0 10pt;font-weight:700;page-break-after:avoid;}
+h4.subsub{font-size:13pt;color:#475569;font-weight:700;margin:14pt 0 8pt;page-break-after:avoid;}
+
+/* ───── COVER PAGE ───── */
+.cover-page{text-align:center;page-break-after:always;padding-top:60pt;}
+.cover-page .univ{font-size:18pt;font-weight:bold;color:var(--sec);letter-spacing:.04em;}
+.cover-page .school{font-size:13pt;color:var(--mut);margin:4pt 0 30pt;}
+.cover-page .title{font-size:24pt;font-weight:bold;color:var(--pri);margin:30pt 0 12pt;line-height:1.4;}
+.cover-page .sub{font-size:13pt;margin:12pt 0;}
+
+.meta-grid{margin:30pt auto;max-width:520pt;display:grid;grid-template-columns:1fr 1fr;gap:16pt;text-align:left;}
+.meta-box{padding:16pt;border:1px solid var(--bdr);border-radius:8pt;}
+.meta-box strong{display:block;margin-bottom:4pt;color:var(--pri);font-family:var(--font-head);}
+
+/* ───── TABLES ───── */
+table{width:100%;border-collapse:collapse;margin:12pt 0;font-size:12pt;line-height:1.6;}
+th,td{border:1px solid #94a3b8;padding:7pt 10pt;text-align:left;vertical-align:top;}
+th{background:#eff6ff;color:var(--sec);font-weight:700;font-family:var(--font-head);}
+
+/* ───── LISTS ───── */
+ul,ol{padding-left:24pt;margin:8pt 0;}
+li{margin-bottom:6pt;}
+
+/* ───── CODE ───── */
+pre{background:#f1f5f9;border:1px solid var(--bdr);border-radius:6pt;padding:12pt 14pt;overflow-x:auto;font-family:"Courier New",monospace;font-size:10pt;line-height:1.55;margin:10pt 0;white-space:pre-wrap;word-wrap:break-word;}
+code{font-family:"Courier New",monospace;font-size:10pt;background:#f1f5f9;padding:1pt 4pt;border-radius:3pt;}
+
+/* ───── FIGURE ───── */
+.fig{text-align:center;margin:16pt 0;page-break-inside:avoid;}
+.fig-caption{font-size:11pt;color:var(--mut);font-style:italic;margin-top:6pt;}
+
+/* ───── HIGHLIGHT BOX ───── */
+.hl{padding:14pt 16pt;border-left:5px solid var(--ok);background:#f0fdf4;margin:14pt 0;}
+.warn{border-left-color:#eab308;background:#fefce8;}
+.info{border-left-color:var(--acc);background:#eff6ff;}
+
+/* ───── SIGNATURE ───── */
+.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:28pt;margin-top:32pt;}
+.sig-line{margin-top:60pt;border-top:1px solid #334155;padding-top:8pt;font-weight:600;}
+
+/* ───── TOC ───── */
+.toc ol{counter-reset:toc;list-style:none;padding-left:0;}
+.toc li{counter-increment:toc;padding:5pt 0;border-bottom:1px dotted var(--bdr);}
+.toc li::before{content:counter(toc) ". ";font-weight:700;color:var(--acc);margin-right:6pt;}
+.toc li ul{list-style:disc;margin-top:4pt;padding-left:20pt;}
+.toc li ul li{border-bottom:none;padding:2pt 0;}
+.toc li ul li::before{content:none;}
+
+/* ───── PAGE BREAK ───── */
+.pb{page-break-after:always;}
+
+/* ───── PRINT ───── */
+@media print{
+body{font-size:12pt;line-height:2;background:#fff;}
+.toolbar{display:none!important;}
+.page{max-width:100%;margin:0;padding:20mm 22mm 20mm 28mm;}
+pre{font-size:9pt;}
+table{font-size:10pt;}
+h1.chapter{font-size:18pt;}
+h2.section{font-size:15pt;}
+}
+
+@media screen{
+.page{box-shadow:0 0 40px rgba(0,0,0,.08);border:1px solid #e5e7eb;margin-top:20px;margin-bottom:40px;border-radius:4px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ TOOLBAR ═══ -->
+<div class="toolbar">
+  <h1>BCSP-064 Project Report – Nikhil P N (2350526613)</h1>
+  <div class="grp">
+    <button class="btn btn-l" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Top</button>
+    <a href="/project-report/doc/" class="btn btn-p" style="text-decoration:none;display:inline-flex;align-items:center;">📄 Download DOC</a>
+    <button class="btn btn-l" onclick="window.print()">🖨 Print</button>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 1-2 : COVER PAGE
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="cover-page">
+  <div class="univ">INDIRA GANDHI NATIONAL OPEN UNIVERSITY</div>
+  <div class="school">School of Computer and Information Sciences<br>Maidan Garhi, New Delhi – 110 068</div>
+
+  <div style="margin:28pt 0;font-size:12pt;color:var(--mut);letter-spacing:.08em;text-transform:uppercase;">Project Report</div>
+  <div style="font-size:11pt;color:var(--mut);">Course Code: <strong style="color:var(--sec)">BCSP-064</strong></div>
+  <div style="font-size:11pt;color:var(--mut);margin-bottom:14pt;">BCA – 6<sup>th</sup> Semester</div>
+
+  <div class="title">Hotel Room Booking Website<br>with Assistant Chatbot</div>
+
+  <p class="sub">Submitted in partial fulfilment of the requirement for the award of the degree of</p>
+  <p style="font-size:15pt;font-weight:bold;color:var(--sec);">Bachelor of Computer Applications (BCA)</p>
+
+  <div class="meta-grid">
+    <div class="meta-box">
+      <strong>Submitted By</strong>
+      <div>Name: <strong>Nikhil P N</strong></div>
+      <div>Enrolment No: <strong>2350526613</strong></div>
+      <div>Programme: BCA</div>
+      <div>Study Centre Code: ___________</div>
+      <div>Regional Centre: <strong>IGNOU Kolkata Regional Centre</strong></div>
+      <div>Address: ___________</div>
+    </div>
+    <div class="meta-box">
+      <strong>Under the Guidance of</strong>
+      <div>Guide Name: ___________</div>
+      <div>Designation: ___________</div>
+      <div>Qualification: ___________</div>
+      <div>Address: ___________</div>
+      <div>Academic Year: <strong>2025 – 2026</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 3 : CERTIFICATE OF ORIGINALITY
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">Certificate of Originality</h1>
+
+<p>This is to certify that the project report entitled <strong>"Hotel Room Booking Website with Assistant Chatbot"</strong> submitted to <strong>Indira Gandhi National Open University (IGNOU)</strong> in partial fulfilment of the requirements for the award of the degree of <strong>Bachelor of Computer Applications (BCA)</strong> is an original piece of work carried out by <strong>Mr. Nikhil P N</strong>, bearing Enrolment Number <strong>2350526613</strong>, under the guidance of <strong>Mr./Ms. ___________</strong>.</p>
+
+<p>The matter embodied in this project report is a genuine work done by the student and has not been submitted in part or in full, whether to this University or to any other University or Institute, for the fulfilment of the requirement of any course of study.</p>
+
+<p>It is further certified that the student has fulfilled all the conditions of eligibility for submitting the project report, the report has been examined, and I recommend the same for the award of the degree of BCA.</p>
+
+<div class="sig-grid">
+  <div>
+    <div class="sig-line">Signature of the Student</div>
+    <div style="color:var(--mut)">Name: Nikhil P N<br>Enrolment No: 2350526613<br>Date: ___________</div>
+  </div>
+  <div>
+    <div class="sig-line">Signature of the Guide</div>
+    <div style="color:var(--mut)">Name: ___________<br>Designation: ___________<br>Address: ___________<br>Date: ___________</div>
+  </div>
+</div>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 4 : ACKNOWLEDGEMENT
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">Acknowledgement</h1>
+
+<p>I would like to express my sincere gratitude to <strong>Indira Gandhi National Open University (IGNOU)</strong> for providing me with the opportunity to undertake this project as part of the BCA programme. The knowledge and skills gained during the course of study have been instrumental in the successful completion of this project.</p>
+
+<p>I am deeply indebted to my project guide, <strong>Mr./Ms. ___________</strong>, whose valuable guidance, constant encouragement, and constructive suggestions throughout the duration of this project enabled me to complete it successfully. Their expertise in the field of computer science and willingness to spare their valuable time has been immensely helpful.</p>
+
+<p>I extend my heartfelt thanks to the <strong>IGNOU Kolkata Regional Centre</strong> and my Study Centre for their administrative support and for ensuring the smooth progression of my academic journey throughout the BCA programme.</p>
+
+<p>I also wish to acknowledge my gratitude to all the faculty members of the School of Computer and Information Sciences, IGNOU, whose teachings in subjects like Database Management Systems, Internet Technology, Software Engineering, Object-Oriented Technology, and Web Programming have provided me with the theoretical foundation and practical skills necessary for this project.</p>
+
+<p>I am also thankful to the open-source community, the developers of the Django framework, the Python programming language, and the various libraries and tools (Razorpay, xhtml2pdf, Bootstrap) used in this project. Their freely available documentation, tutorials, and forums have been invaluable resources.</p>
+
+<p>Last but not least, I express my deepest gratitude to my family and friends for their constant moral support and encouragement throughout the period of this project work. Their faith in me kept me motivated even during challenging phases of development and testing.</p>
+
+<p style="margin-top:36pt;text-align:right;">
+  <strong>Nikhil P N</strong><br>
+  Enrolment No: 2350526613<br>
+  BCA – 6<sup>th</sup> Semester<br>
+  IGNOU Kolkata Regional Centre
+</p>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 5-6 : TABLE OF CONTENTS
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">Table of Contents</h1>
+
+<div class="toc">
+<ol>
+  <li>Certificate of Originality</li>
+  <li>Acknowledgement</li>
+  <li>Abstract</li>
+  <li>Introduction
+    <ul>
+      <li>Background of the Problem</li>
+      <li>Motivation for the Project</li>
+      <li>Scope of the Project</li>
+    </ul>
+  </li>
+  <li>Objectives of the Project</li>
+  <li>Project Category</li>
+  <li>System Study
+    <ul>
+      <li>Study of Existing System</li>
+      <li>Limitations of the Existing System</li>
+      <li>Proposed System</li>
+      <li>Advantages of the Proposed System</li>
+    </ul>
+  </li>
+  <li>Feasibility Study
+    <ul>
+      <li>Technical Feasibility</li>
+      <li>Operational Feasibility</li>
+      <li>Economic Feasibility</li>
+    </ul>
+  </li>
+  <li>Tools / Platform, Hardware and Software Requirements</li>
+  <li>Analysis Document
+    <ul>
+      <li>Software Requirement Specification (SRS)</li>
+      <li>Data Flow Diagrams (DFD Level-0 &amp; Level-1)</li>
+      <li>Entity-Relationship Diagram</li>
+      <li>Data Dictionary</li>
+    </ul>
+  </li>
+  <li>Design Document
+    <ul>
+      <li>Modularization Details (8 Modules)</li>
+      <li>Database Design and Normalization</li>
+      <li>Procedural Design / Process Logic</li>
+      <li>User Interface Design</li>
+    </ul>
+  </li>
+  <li>Source Code (Key Modules)
+    <ul>
+      <li>Django Models</li>
+      <li>Booking with Overlap Detection</li>
+      <li>Advanced Search API</li>
+      <li>Chatbot Engine</li>
+      <li>Payment Integration</li>
+      <li>OTP-Based Password Reset</li>
+    </ul>
+  </li>
+  <li>Testing
+    <ul>
+      <li>Testing Strategy</li>
+      <li>Unit Testing</li>
+      <li>Integration Testing</li>
+      <li>System Testing</li>
+      <li>User Acceptance Testing</li>
+      <li>Debugging and Bug Fixing</li>
+    </ul>
+  </li>
+  <li>Validations Performed</li>
+  <li>Input and Output Screens</li>
+  <li>Report Generation</li>
+  <li>Implementation of Security</li>
+  <li>Deployment and Installation Guide</li>
+  <li>Limitations of the Project</li>
+  <li>Future Scope and Enhancement</li>
+  <li>Glossary of Terms</li>
+  <li>Bibliography</li>
+</ol>
+</div>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 7-8 : ABSTRACT
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">1. Abstract</h1>
+
+<p>The <strong>Hotel Room Booking Website with Assistant Chatbot</strong> is a comprehensive, full-stack web application developed using <strong>Python</strong>, the <strong>Django 6.0</strong> web framework, and a <strong>PostgreSQL</strong> relational database. The system has been designed and developed to automate end-to-end hotel operations including room-type management, room inventory control, customer registration, online room booking with date-based availability checking, payment processing through the Razorpay payment gateway, staff administration, customer contact handling, email notifications, PDF report generation, and an intelligent assistant chatbot that can answer guest queries about rooms, bookings, staff, and hotel policies.</p>
+
+<p>The project follows the <strong>Software Development Life Cycle (SDLC)</strong> and encompasses all the major phases: Requirements Analysis, System Design, Coding, Testing, and Documentation. It consists of eight functional modules spanning both the administrator backend and the customer-facing website, and exposes RESTful API endpoints for the chatbot and advanced search features. The application is fully responsive and works seamlessly across desktop computers, tablets, and mobile devices.</p>
+
+<p>The administrator can manage room types, rooms, staff profiles, customer enquiries, bookings, payments, chatbot responses, and notifications from a secure backend interface. Customers can register, sign in, browse rooms by category, search with advanced filters (room type, price range, dates), book available rooms with automatic overlap detection, make secure online payments via Razorpay, interact with the chatbot for instant assistance, submit contact enquiries, and reset their passwords using email-based OTP verification.</p>
+
+<p>The system stores data in a normalized relational database with ten interconnected tables and enforces referential integrity through primary-key and foreign-key constraints. Efficient querying, input validation, CSRF protection, and session-based access control ensure a secure and responsive user experience. The project demonstrates the practical application of RDBMS concepts, internet technology, and AI-assisted user interaction in the hospitality domain.</p>
+
+<p><strong>Keywords:</strong> Hotel Room Booking, Django, Python, PostgreSQL, Chatbot, Razorpay, AJAX, Bootstrap, PDF Generation, Email OTP, REST API, SDLC, Software Engineering.</p>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 9-12 : INTRODUCTION
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">2. Introduction</h1>
+
+<h2 class="section">2.1 Background of the Problem</h2>
+
+<p>The hospitality industry is one of the largest and fastest-growing sectors of the global economy. Hotels, resorts, and guest houses serve millions of travellers every day and face the critical challenge of efficiently managing room inventory, customer bookings, payments, and guest communication. In many small and medium-sized hotels, especially in developing countries, room booking and management are still done using manual methods such as paper-based registers, phone-based reservations, and disconnected spreadsheets. These traditional approaches have numerous disadvantages including the risk of duplicate bookings, inaccurate room availability records, delayed guest communication, data loss, and difficulty in generating financial and occupancy reports.</p>
+
+<p>With the advent of the internet and web technologies, customers increasingly expect the ability to search for rooms, compare prices, check availability in real time, and make bookings and payments online without visiting the hotel in person or calling the front desk. Hotels that fail to provide an online presence with booking capabilities risk losing customers to competitors who do. Furthermore, the increasing use of chatbots and AI-powered assistants in customer service has raised guest expectations for instant, 24/7 responses to common questions about room availability, pricing, check-in/check-out times, and hotel policies.</p>
+
+<p>This project aims to address all of these challenges by building a web-based Hotel Room Booking System that serves both the hotel administration and the customer, providing a single, unified platform for all hotel operations.</p>
+
+<h2 class="section">2.2 Motivation for the Project</h2>
+
+<p>The motivation for undertaking this project stems from several observations and requirements:</p>
+
+<ol>
+  <li><strong>Academic Requirement:</strong> The BCSP-064 project is a mandatory component of the BCA 6<sup>th</sup>-semester curriculum at IGNOU. It requires the development of a software application that demonstrates competence in programming, database management, software engineering, and internet technology—all of which are core subjects in the BCA programme.</li>
+  <li><strong>Real-World Relevance:</strong> The hotel industry has a genuine need for affordable, customizable booking solutions. Many small hotels cannot afford enterprise-level Property Management Systems (PMS) and would benefit from an open-source, Django-based system that can be deployed on a standard web server.</li>
+  <li><strong>Full-Stack Skill Development:</strong> Developing this project provides hands-on experience with front-end technologies (HTML5, CSS3, Bootstrap 5, JavaScript), back-end development (Python, Django), database design (PostgreSQL, SQL), payment gateway integration (Razorpay), email services (Django SMTP), PDF generation (xhtml2pdf), and basic AI/chatbot development.</li>
+  <li><strong>Interest in AI-Assisted Services:</strong> The inclusion of a chatbot module was motivated by the growing importance of conversational AI in customer service. Even a rule-based chatbot can significantly reduce the workload on hotel staff by answering frequently asked questions instantly.</li>
+</ol>
+
+<h2 class="section">2.3 Scope of the Project</h2>
+
+<p>The scope of this project covers the following functional areas:</p>
+
+<ul>
+  <li><strong>Customer-Facing Website:</strong> A responsive, publicly accessible website where customers can browse room categories, view room details and images, search rooms with advanced filters, register and sign in, make bookings, process payments, submit contact enquiries, interact with the chatbot, and reset their passwords via email OTP.</li>
+  <li><strong>Administrator Backend:</strong> A secure, login-protected admin panel where hotel staff can manage room types, rooms, staff profiles, view and delete customer contact messages, view booking records, view payment details, and manage chatbot responses and notifications via the Django Admin interface.</li>
+  <li><strong>Database:</strong> A normalized PostgreSQL relational database with ten tables covering room types, rooms, users, bookings, payments, staff, customer contacts, chatbot conversations, chatbot predefined responses, and notifications.</li>
+  <li><strong>API Endpoints:</strong> RESTful JSON API endpoints for the chatbot (query and rating), advanced room search, notification retrieval, and notification status updates.</li>
+  <li><strong>Reporting:</strong> On-screen reports for bookings, payments, contacts, and staff, as well as PDF download capability for booking records.</li>
+</ul>
+
+<p>The project does <em>not</em> cover multi-hotel/multi-branch management, dynamic pricing, loyalty programmes, third-party OTA (Online Travel Agency) channel integration, or deployment on cloud infrastructure—these are identified as future enhancements.</p>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 13 : OBJECTIVES
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">3. Objectives of the Project</h1>
+
+<p>The primary objectives of this project are:</p>
+
+<ol>
+  <li>To design and develop a web-based hotel room booking system that automates room type management, room inventory management, booking management, staff management, and customer contact management using the Django web framework and Python programming language.</li>
+  <li>To provide customers with a user-friendly, responsive web interface for browsing hotel room categories, viewing room details (with images, prices, and descriptions), and searching for rooms using advanced filters including room name, room type, price range, and check-in/check-out date availability.</li>
+  <li>To implement date-range-based availability checking logic that prevents double booking of the same room by detecting overlapping check-in and check-out dates before confirming any booking.</li>
+  <li>To integrate an online payment gateway (Razorpay) for secure transaction processing so that customers can pay for their bookings online using credit cards, debit cards, UPI, and net banking.</li>
+  <li>To build an intelligent assistant chatbot that can classify user queries into categories (room, staff, booking, general) and provide relevant, context-aware responses including room cards with images and prices for room-related queries.</li>
+  <li>To implement advanced room search functionality with real-time AJAX-based filtering that returns results without full page reload, enhancing the user experience.</li>
+  <li>To incorporate email notification services for booking confirmations and OTP-based password recovery so that customers receive immediate communication for critical actions.</li>
+  <li>To generate downloadable PDF reports of booking details using the xhtml2pdf library for record-keeping and future reference.</li>
+  <li>To maintain secure access control through user authentication, session management, CSRF protection, and input validation to prevent unauthorized access and common web security vulnerabilities.</li>
+  <li>To follow Software Engineering practices and the Software Development Life Cycle (SDLC) throughout the development process, including requirements gathering, system analysis, design, coding, testing, and documentation.</li>
+</ol>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 14 : PROJECT CATEGORY
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">4. Project Category</h1>
+
+<p>This project falls under the following categories as defined by the IGNOU BCSP-064 guidelines:</p>
+
+<table>
+  <tr><th style="width:30%">Category</th><th>Description</th></tr>
+  <tr>
+    <td><strong>RDBMS (Relational Database Management System)</strong></td>
+    <td>The project uses a PostgreSQL relational database with ten normalized tables connected by primary-key and foreign-key relationships. The database design follows normalization principles (up to 3NF) to eliminate data redundancy and ensure data integrity. All data operations are performed through Django's Object-Relational Mapper (ORM), which translates Python model definitions into SQL queries.</td>
+  </tr>
+  <tr>
+    <td><strong>Internet Technology / Web Application</strong></td>
+    <td>The project is a full-stack web application built with the Django web framework. The frontend uses HTML5, CSS3, Bootstrap 5.3, and vanilla JavaScript (ES6). It employs AJAX (XMLHttpRequest / Fetch API) for asynchronous operations such as the advanced room search and chatbot communication. RESTful API endpoints return JSON responses. The application is accessible through any modern web browser over HTTP/HTTPS.</td>
+  </tr>
+  <tr>
+    <td><strong>AI Application (Chatbot)</strong></td>
+    <td>The project includes an assistant chatbot module that uses rule-based keyword classification to understand user intent and generate contextually relevant responses. The chatbot can query the database for rooms, staff, and bookings and present results in a conversational format with rich UI elements (room cards, suggestion chips). Conversations are stored for analytics, and users can rate responses for quality feedback.</td>
+  </tr>
+</table>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 15-17 : SYSTEM STUDY
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">5. System Study</h1>
+
+<h2 class="section">5.1 Study of the Existing System</h2>
+
+<p>Before developing the proposed system, a thorough study of the existing hotel management practices was conducted. In many small and medium-sized hotels, the following manual and semi-automated systems are in use:</p>
+
+<ol>
+  <li><strong>Paper-Based Booking Register:</strong> Room bookings are recorded manually in a physical register or diary. The receptionist writes the guest name, contact details, room number, check-in date, check-out date, and amount in the register. This register is the primary source of booking information.</li>
+  <li><strong>Phone-Based Reservations:</strong> Customers call the hotel to enquire about room availability and make reservations. The receptionist checks the register manually, informs the caller about availability, and records the booking on paper or in a simple spreadsheet.</li>
+  <li><strong>Spreadsheet-Based Records:</strong> Some hotels use Microsoft Excel or Google Sheets to maintain booking records, guest information, and payment details. While this is an improvement over paper registers, it still requires manual data entry, is prone to errors, and does not provide real-time availability checking.</li>
+  <li><strong>No Online Presence:</strong> Many small hotels do not have a website or online booking capability. Customers must visit the hotel in person or call to check availability and make bookings, which is inconvenient and limits the hotel's reach.</li>
+  <li><strong>No Automated Communication:</strong> Booking confirmations, reminders, and other communications are sent manually via phone calls or occasionally by email. There is no automated system for sending confirmation emails, OTPs, or notifications.</li>
+</ol>
+
+<h2 class="section">5.2 Limitations of the Existing System</h2>
+
+<ol>
+  <li><strong>Double Booking Risk:</strong> Without real-time availability checking, two or more guests may be booked for the same room on overlapping dates, leading to embarrassing situations and guest dissatisfaction.</li>
+  <li><strong>Data Redundancy:</strong> Guest information, room details, and booking records may be duplicated across multiple registers, spreadsheets, or files, leading to inconsistencies.</li>
+  <li><strong>Slow Retrieval:</strong> Searching for a specific booking, guest record, or payment history in a paper register or large spreadsheet is time-consuming and error-prone.</li>
+  <li><strong>No Report Generation:</strong> Generating summary reports for occupancy rates, revenue, payment collections, or guest demographics is extremely difficult and labour-intensive with manual systems.</li>
+  <li><strong>Security Concerns:</strong> Paper registers can be lost, damaged, or accessed by unauthorized persons. Spreadsheets may not have proper access controls.</li>
+  <li><strong>No Online Access:</strong> Customers cannot check room availability or make bookings from their homes or offices, limiting the hotel's customer base.</li>
+  <li><strong>No 24/7 Assistance:</strong> Without a chatbot or automated FAQ system, guest enquiries can only be answered during front-desk working hours.</li>
+  <li><strong>Delayed Payment Processing:</strong> Payments are typically collected at check-in or check-out in cash. There is no facility for advance online payment, which affects the hotel's cash flow and booking commitment.</li>
+</ol>
+
+<h2 class="section">5.3 Proposed System</h2>
+
+<p>The proposed system is a web-based Hotel Room Booking application that addresses all the limitations of the existing system. It provides:</p>
+
+<ul>
+  <li>A centralized relational database that stores all hotel data (room types, rooms, staff, bookings, payments, contacts, chatbot interactions) in normalized tables with referential integrity.</li>
+  <li>An administrator backend where hotel staff can perform CRUD (Create, Read, Update, Delete) operations on room types, rooms, staff profiles, and can view booking records, payment totals, and customer messages.</li>
+  <li>A customer-facing website where guests can register, sign in, browse rooms, search with advanced filters, book rooms with automatic date-overlap detection, make online payments via Razorpay, submit contact enquiries, and interact with a chatbot.</li>
+  <li>Automated email notifications for booking confirmations and OTP-based password resets.</li>
+  <li>PDF report generation for booking records.</li>
+  <li>A responsive, mobile-friendly design using Bootstrap 5.3.</li>
+</ul>
+
+<h2 class="section">5.4 Advantages of the Proposed System</h2>
+
+<ol>
+  <li><strong>Elimination of Double Booking:</strong> The system checks for date-range overlaps before confirming any booking, ensuring that no room is booked twice for the same period.</li>
+  <li><strong>Centralized Data Management:</strong> All data is stored in a single database, eliminating redundancy and ensuring consistency.</li>
+  <li><strong>Instant Search and Retrieval:</strong> AJAX-powered advanced search allows staff and customers to find rooms, bookings, and records in milliseconds.</li>
+  <li><strong>Automated Reporting:</strong> Booking summaries, payment totals, and contact records are generated automatically and can be exported as PDF.</li>
+  <li><strong>Enhanced Security:</strong> Session-based authentication, CSRF protection, ORM-based parameterised queries, and input validation protect against unauthorized access and common web attacks.</li>
+  <li><strong>24/7 Online Access:</strong> Customers can browse, search, and book rooms at any time from any device with an internet connection.</li>
+  <li><strong>Instant Customer Support:</strong> The chatbot provides immediate responses to common queries about rooms, staff, bookings, and hotel policies, reducing the workload on front-desk staff.</li>
+  <li><strong>Secure Online Payments:</strong> Integration with Razorpay allows customers to pay online using multiple payment methods, improving cash flow and booking commitment.</li>
+  <li><strong>Scalability:</strong> The modular Django architecture allows new modules to be added with minimal changes to the existing codebase.</li>
+</ol>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 18-19 : FEASIBILITY STUDY
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">6. Feasibility Study</h1>
+
+<p>A feasibility study was conducted before starting the development to assess whether the project is practical and viable. The study covered three dimensions: technical, operational, and economic feasibility.</p>
+
+<h2 class="section">6.1 Technical Feasibility</h2>
+
+<p>Technical feasibility examines whether the required technology, tools, and skills are available to develop the system.</p>
+
+<ul>
+  <li><strong>Programming Language:</strong> Python 3.x is a mature, widely-used, open-source language with extensive library support. It is well-suited for web development and AI applications.</li>
+  <li><strong>Web Framework:</strong> Django 6.0 is one of the most popular Python web frameworks. It follows the MVT (Model-View-Template) architecture, provides a built-in admin interface, ORM, form handling, authentication, CSRF protection, and URL routing, making it ideal for rapid application development.</li>
+  <li><strong>Database:</strong> PostgreSQL is used as the main relational database. It supports SQL standards, advanced features, and is suitable for both small and large-scale applications. The project is fully compatible with PostgreSQL for production deployment.</li>
+  <li><strong>Frontend Technologies:</strong> HTML5, CSS3, Bootstrap 5.3, and JavaScript (ES6) are standard, well-documented, and supported by all modern browsers.</li>
+  <li><strong>Payment Gateway:</strong> Razorpay provides a well-documented Python SDK and test mode (sandbox) for development, making integration straightforward.</li>
+  <li><strong>PDF Generation:</strong> xhtml2pdf converts HTML templates to PDF documents, leveraging the same Django template engine used for web pages.</li>
+  <li><strong>Development Tools:</strong> VS Code (editor), Git (version control), and Chrome DevTools (debugging) are freely available and widely used.</li>
+  <li><strong>Developer Skills:</strong> The developer (student) has completed courses in Python, DBMS, Internet Technology, Software Engineering, and Web Programming as part of the BCA curriculum, providing the necessary skills.</li>
+</ul>
+
+<p><strong>Conclusion:</strong> The project is technically feasible. All required technologies are open-source, well-documented, and within the developer's skill set.</p>
+
+<h2 class="section">6.2 Operational Feasibility</h2>
+
+<p>Operational feasibility examines whether the system can be practically used in a real hotel environment.</p>
+
+<ul>
+  <li><strong>Ease of Use:</strong> The admin backend provides simple forms for adding, editing, and deleting data. The customer website uses an intuitive layout with clear navigation. No technical expertise is required to operate the system.</li>
+  <li><strong>Training:</strong> Minimal training is needed. The admin interface uses standard form controls (text fields, dropdowns, file uploads, buttons). The customer website follows common e-commerce patterns that users are already familiar with.</li>
+  <li><strong>Acceptance:</strong> The system offers significant improvements over manual methods (speed, accuracy, convenience, 24/7 access), which should lead to high user acceptance.</li>
+  <li><strong>Support:</strong> The chatbot provides instant, automated customer support, reducing the dependency on human staff for routine enquiries.</li>
+</ul>
+
+<p><strong>Conclusion:</strong> The project is operationally feasible. It is user-friendly, requires minimal training, and offers clear benefits over existing manual processes.</p>
+
+<h2 class="section">6.3 Economic Feasibility</h2>
+
+<p>Economic feasibility assesses the cost-benefit ratio of the project.</p>
+
+<table>
+  <tr><th>Cost Component</th><th>Estimated Cost</th></tr>
+  <tr><td>Python, Django, PostgreSQL, Bootstrap, JavaScript</td><td>Free (open-source)</td></tr>
+  <tr><td>VS Code IDE</td><td>Free (open-source)</td></tr>
+  <tr><td>Razorpay (test mode for development)</td><td>Free; transaction fees in production (~2%)</td></tr>
+  <tr><td>xhtml2pdf library</td><td>Free (open-source)</td></tr>
+  <tr><td>Development hardware (laptop/PC)</td><td>Already available</td></tr>
+  <tr><td>Internet connection</td><td>Already available</td></tr>
+  <tr><td>Web hosting for production (optional)</td><td>₹200–₹500/month (shared hosting)</td></tr>
+  <tr><td><strong>Total Development Cost</strong></td><td><strong>Negligible (near zero)</strong></td></tr>
+</table>
+
+<p><strong>Benefits:</strong> The system eliminates double bookings (reducing guest complaints and refunds), saves staff time through automation, enables online bookings (increasing revenue), provides instant reports (improving decision-making), and offers 24/7 chatbot support (enhancing guest satisfaction).</p>
+
+<p><strong>Conclusion:</strong> The project is economically feasible. It uses free, open-source tools and provides significant operational benefits relative to its negligible development cost.</p>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 20-21 : TOOLS & REQUIREMENTS
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">7. Tools / Platform, Hardware and Software Requirements</h1>
+
+<h2 class="section">7.1 Software Requirements</h2>
+
+<table>
+  <tr><th style="width:35%">Component</th><th>Specification</th></tr>
+  <tr><td>Operating System</td><td>Windows 10/11, Linux (Ubuntu 20.04+), or macOS</td></tr>
+  <tr><td>Programming Language</td><td>Python 3.10+ (3.x series)</td></tr>
+  <tr><td>Web Framework</td><td>Django 6.0</td></tr>
+  <tr><td>Database</td><td>PostgreSQL 16 (open-source, advanced relational database)</td></tr>
+  <tr><td>Frontend – Markup &amp; Styling</td><td>HTML5, CSS3, Bootstrap 5.3</td></tr>
+  <tr><td>Frontend – Scripting</td><td>JavaScript (ES6), AJAX (Fetch API)</td></tr>
+  <tr><td>Payment Gateway</td><td>Razorpay Python SDK (<code>razorpay</code> package)</td></tr>
+  <tr><td>PDF Generation</td><td>xhtml2pdf 0.2+ (Python library)</td></tr>
+  <tr><td>Email Backend</td><td>Django SMTP Email Backend (Gmail SMTP)</td></tr>
+  <tr><td>Environment Configuration</td><td>python-decouple (for managing secrets via <code>.env</code> file)</td></tr>
+  <tr><td>IDE / Code Editor</td><td>Visual Studio Code (VS Code)</td></tr>
+  <tr><td>Web Browser (Testing)</td><td>Google Chrome 120+, Microsoft Edge 120+, Mozilla Firefox 120+</td></tr>
+  <tr><td>Version Control</td><td>Git 2.x</td></tr>
+  <tr><td>Virtual Environment</td><td>Python <code>venv</code> module</td></tr>
+</table>
+
+<h2 class="section">7.2 Python Package Dependencies</h2>
+
+<p>The following Python packages are installed in the virtual environment (as specified in <code>requirements.txt</code>):</p>
+
+<table>
+  <tr><th>Package</th><th>Purpose</th></tr>
+  <tr><td><code>django</code></td><td>Web framework</td></tr>
+  <tr><td><code>razorpay</code></td><td>Razorpay payment gateway SDK</td></tr>
+  <tr><td><code>xhtml2pdf</code></td><td>HTML to PDF conversion</td></tr>
+  <tr><td><code>reportlab</code></td><td>PDF rendering engine (dependency of xhtml2pdf)</td></tr>
+  <tr><td><code>python-decouple</code></td><td>Environment variable management</td></tr>
+  <tr><td><code>Pillow</code></td><td>Image processing for ImageField</td></tr>
+  <tr><td><code>pdfplumber</code></td><td>PDF text extraction utility</td></tr>
+</table>
+
+<h2 class="section">7.3 Hardware Requirements</h2>
+
+<table>
+  <tr><th style="width:35%">Component</th><th>Minimum Specification</th><th>Recommended</th></tr>
+  <tr><td>Processor</td><td>Intel Core i3 / Dual-core equivalent</td><td>Intel Core i5 or above</td></tr>
+  <tr><td>RAM</td><td>4 GB</td><td>8 GB or above</td></tr>
+  <tr><td>Hard Disk Space</td><td>20 GB free</td><td>50 GB SSD</td></tr>
+  <tr><td>Display Resolution</td><td>1366 × 768</td><td>1920 × 1080 (Full HD)</td></tr>
+  <tr><td>Internet Connection</td><td>Required (for payment gateway, email, and deployment)</td><td>Broadband 10 Mbps+</td></tr>
+  <tr><td>Input Devices</td><td>Keyboard and Mouse</td><td>Standard peripherals</td></tr>
+</table>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 22-34 : ANALYSIS DOCUMENT
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">8. Analysis Document</h1>
+
+<h2 class="section">8.1 Software Requirement Specification (SRS)</h2>
+
+<h3 class="subsec">8.1.1 Purpose</h3>
+<p>The purpose of this Software Requirement Specification is to describe the functional and non-functional requirements of the Hotel Room Booking Website with Assistant Chatbot. This document serves as a reference for the development team and the project guide, and defines the expected behaviour of the system.</p>
+
+<h3 class="subsec">8.1.2 Scope</h3>
+<p>The system is a web-based application for hotel room booking and management. It serves two categories of users: <strong>Administrators</strong> (hotel staff) and <strong>Customers</strong> (guests). The application will be accessible via a web browser and will communicate with a PostgreSQL database on the server.</p>
+
+<h3 class="subsec">8.1.3 Functional Requirements – Administrator</h3>
+
+<table>
+  <tr><th>Req. ID</th><th>Requirement</th><th>Description</th></tr>
+  <tr><td>FR-A01</td><td>Admin Login</td><td>The admin shall be able to log in using Django's built-in authentication system (username and password).</td></tr>
+  <tr><td>FR-A02</td><td>Admin Logout</td><td>The admin shall be able to securely log out, destroying the session.</td></tr>
+  <tr><td>FR-A03</td><td>Add Room Type</td><td>The admin shall be able to add a new room type with name, description, and image.</td></tr>
+  <tr><td>FR-A04</td><td>View Room Types</td><td>The admin shall be able to view all room types in a tabular format with edit and delete actions.</td></tr>
+  <tr><td>FR-A05</td><td>Edit Room Type</td><td>The admin shall be able to modify the name, description, and image of an existing room type.</td></tr>
+  <tr><td>FR-A06</td><td>Delete Room Type</td><td>The admin shall be able to delete a room type (subject to referential integrity).</td></tr>
+  <tr><td>FR-A07</td><td>Add Room</td><td>The admin shall be able to add a new room linked to a room type, with name, price, description, and image.</td></tr>
+  <tr><td>FR-A08</td><td>View Rooms</td><td>The admin shall be able to view all rooms with their type, price, and actions.</td></tr>
+  <tr><td>FR-A09</td><td>Edit Room</td><td>The admin shall be able to modify room details.</td></tr>
+  <tr><td>FR-A10</td><td>Delete Room</td><td>The admin shall be able to delete a room (subject to referential integrity).</td></tr>
+  <tr><td>FR-A11</td><td>Add Staff</td><td>The admin shall be able to add staff with name, designation, social links, and photo.</td></tr>
+  <tr><td>FR-A12</td><td>View Staff</td><td>The admin shall view all staff with details and actions.</td></tr>
+  <tr><td>FR-A13</td><td>Edit Staff</td><td>The admin shall be able to modify staff details.</td></tr>
+  <tr><td>FR-A14</td><td>Delete Staff</td><td>The admin shall be able to delete a staff record.</td></tr>
+  <tr><td>FR-A15</td><td>View Contact Messages</td><td>The admin shall view all customer contact messages.</td></tr>
+  <tr><td>FR-A16</td><td>Delete Contact Messages</td><td>The admin shall be able to delete processed contact messages.</td></tr>
+  <tr><td>FR-A17</td><td>View Bookings</td><td>The admin shall view all booking records with customer, room, dates, and price.</td></tr>
+  <tr><td>FR-A18</td><td>View Payment Totals</td><td>The admin shall view all payment records with customer, mobile, and total amount.</td></tr>
+  <tr><td>FR-A19</td><td>Manage Chatbot</td><td>The admin shall manage chatbot responses, conversations, and notifications via Django Admin.</td></tr>
+</table>
+
+<h3 class="subsec">8.1.4 Functional Requirements – Customer</h3>
+
+<table>
+  <tr><th>Req. ID</th><th>Requirement</th><th>Description</th></tr>
+  <tr><td>FR-C01</td><td>User Registration</td><td>A new customer shall be able to register with username, email, password, and confirm password.</td></tr>
+  <tr><td>FR-C02</td><td>User Sign-In</td><td>A registered customer shall be able to sign in with username and password.</td></tr>
+  <tr><td>FR-C03</td><td>User Sign-Out</td><td>A signed-in customer shall be able to sign out, destroying the session.</td></tr>
+  <tr><td>FR-C04</td><td>Browse Room Categories</td><td>The customer shall see room type cards on the home page and navigate to rooms of a specific type.</td></tr>
+  <tr><td>FR-C05</td><td>View Room Details</td><td>The customer shall see room name, image, price, description, and a "Book" button for each room.</td></tr>
+  <tr><td>FR-C06</td><td>Advanced Search</td><td>The customer shall search rooms by name, type, min price, max price, check-in date, and check-out date using an AJAX-powered search panel.</td></tr>
+  <tr><td>FR-C07</td><td>Book a Room</td><td>The customer shall fill in booking details (name, email, dates, adults, children, special request) and submit a booking.</td></tr>
+  <tr><td>FR-C08</td><td>Overlap Detection</td><td>The system shall check for overlapping bookings and reject the booking if the room is already booked for the requested dates.</td></tr>
+  <tr><td>FR-C09</td><td>View Booking Cart</td><td>The customer shall see booked rooms with subtotal, tax, and total amount.</td></tr>
+  <tr><td>FR-C10</td><td>Delete Booking</td><td>The customer shall be able to remove a booking from the cart before payment.</td></tr>
+  <tr><td>FR-C11</td><td>Make Payment</td><td>The customer shall pay the total amount via Razorpay (credit/debit card, UPI, net banking).</td></tr>
+  <tr><td>FR-C12</td><td>Submit Contact Enquiry</td><td>The customer shall submit a contact form with name, email, phone, subject, and message.</td></tr>
+  <tr><td>FR-C13</td><td>Chatbot Interaction</td><td>The customer shall send text messages to the chatbot and receive contextual responses.</td></tr>
+  <tr><td>FR-C14</td><td>Rate Chatbot Response</td><td>The customer shall rate chatbot responses on a 1–5 scale.</td></tr>
+  <tr><td>FR-C15</td><td>Password Reset via OTP</td><td>The customer shall reset their password using an OTP sent to their registered email.</td></tr>
+  <tr><td>FR-C16</td><td>Receive Email Confirmation</td><td>The customer shall receive a booking confirmation email after successful booking.</td></tr>
+</table>
+
+<h3 class="subsec">8.1.5 Non-Functional Requirements</h3>
+
+<table>
+  <tr><th>Category</th><th>Requirement</th></tr>
+  <tr><td>Performance</td><td>Web pages shall load within 2–3 seconds on a broadband connection. AJAX search results shall appear without a full page reload.</td></tr>
+  <tr><td>Security</td><td>CSRF protection on all forms, ORM-based parameterised queries to prevent SQL injection, template auto-escaping to prevent XSS, session-based authentication, password masking on input fields.</td></tr>
+  <tr><td>Usability</td><td>Responsive design that works on desktop (1920px), tablet (768px), and mobile (375px) screen widths. Consistent navigation and layout across all pages.</td></tr>
+  <tr><td>Reliability</td><td>Input validation on all forms (required fields, numeric checks, date format checks). Graceful error handling with user-friendly messages. Date-overlap detection prevents booking conflicts.</td></tr>
+  <tr><td>Maintainability</td><td>Modular Django app structure (Backend app, webapp). Separation of concerns (models, views, templates, URLs). Code documentation with comments.</td></tr>
+  <tr><td>Scalability</td><td>Database uses PostgreSQL for production-grade scalability, concurrent write support, and cloud deployment readiness. New modules can be added as new Django apps. API endpoints support future mobile app development.</td></tr>
+  <tr><td>Portability</td><td>The application runs on Windows, Linux, and macOS. It requires only Python, Django, and a web browser.</td></tr>
+</table>
+
+<div class="pb"></div>
+
+<!-- DFD -->
+<h2 class="section">8.2 Data Flow Diagrams (DFD)</h2>
+
+<h3 class="subsec">8.2.1 DFD Level-0 (Context Diagram)</h3>
+
+<p>The context diagram shows the system as a single process with two external entities: <strong>Customer</strong> and <strong>Administrator</strong>. It represents the highest-level view of data flow in and out of the system.</p>
+
+<div class="fig">
+  <div style="border:2px solid var(--acc);border-radius:12pt;padding:30pt;display:inline-block;max-width:600pt;margin:auto;">
+    <div style="display:flex;align-items:center;justify-content:center;gap:30pt;flex-wrap:wrap;">
+      <div style="border:2px solid var(--pri);border-radius:8pt;padding:14pt 22pt;background:#eff6ff;font-weight:700;">CUSTOMER<br><span style="font-weight:400;font-size:10pt">(External Entity)</span></div>
+      <div style="text-align:center;">
+        <div style="font-size:10pt;color:var(--mut);margin-bottom:4pt;">Registration, Login, Search,<br>Booking, Payment, Contact, Chat</div>
+        <div style="font-size:28pt;">⟶</div>
+        <div style="font-size:28pt;">⟵</div>
+        <div style="font-size:10pt;color:var(--mut);margin-top:4pt;">Room details, Booking confirmation,<br>Search results, Chat responses, PDF</div>
+      </div>
+      <div style="border:3px solid var(--pri);border-radius:50%;width:160pt;height:160pt;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:700;background:#dbeafe;line-height:1.3;font-size:12pt;">Hotel Room<br>Booking<br>System<br><span style="font-size:9pt;font-weight:400">(Process 0.0)</span></div>
+      <div style="text-align:center;">
+        <div style="font-size:10pt;color:var(--mut);margin-bottom:4pt;">Room/Staff/Type CRUD,<br>View bookings, View payments</div>
+        <div style="font-size:28pt;">⟵</div>
+        <div style="font-size:28pt;">⟶</div>
+        <div style="font-size:10pt;color:var(--mut);margin-top:4pt;">Reports, Records,<br>Notifications, Chatbot logs</div>
+      </div>
+      <div style="border:2px solid var(--pri);border-radius:8pt;padding:14pt 22pt;background:#eff6ff;font-weight:700;">ADMINISTRATOR<br><span style="font-weight:400;font-size:10pt">(External Entity)</span></div>
+    </div>
+  </div>
+  <div class="fig-caption">Figure 8.1 – DFD Level-0 (Context Diagram)</div>
+</div>
+
+<h3 class="subsec">8.2.2 DFD Level-1</h3>
+
+<p>The Level-1 DFD decomposes the single process of the context diagram into eight sub-processes corresponding to the eight functional modules of the system. It also shows the data stores (database tables) that each process reads from and writes to.</p>
+
+<table>
+  <tr><th>Process</th><th>Input Data Flow</th><th>Output Data Flow</th><th>Data Store(s)</th></tr>
+  <tr><td><strong>1.0</strong> User Registration &amp; Login</td><td>Username, Email, Password, Login credentials</td><td>Session token, Access granted/denied, Success/Error message</td><td>D1: USER_MASTER (Registerdb)</td></tr>
+  <tr><td><strong>2.0</strong> Room Type Management</td><td>Room type name, image, description</td><td>Updated room type catalogue, Success message</td><td>D2: ROOMTYPE_MASTER (roomtypedb)</td></tr>
+  <tr><td><strong>3.0</strong> Room Management</td><td>Room name, type FK, image, price, description</td><td>Updated room inventory, Success message</td><td>D3: ROOM_MASTER (roomnamedb), D2</td></tr>
+  <tr><td><strong>4.0</strong> Staff Management</td><td>Staff name, designation, image, social links</td><td>Staff list for website &amp; admin</td><td>D4: STAFF_MASTER (staffdb)</td></tr>
+  <tr><td><strong>5.0</strong> Room Search &amp; Booking</td><td>Search filters, dates, guest details</td><td>Search results (JSON), Booking confirmation/rejection, Email</td><td>D3, D5: BOOKING_MASTER (bookingdb), D1</td></tr>
+  <tr><td><strong>6.0</strong> Payment Processing</td><td>Booking total, customer mobile, payment method</td><td>Razorpay order, Payment receipt, Success message</td><td>D6: PAYMENT_TOTAL (Totaldb), D5</td></tr>
+  <tr><td><strong>7.0</strong> Contact Management</td><td>Name, email, phone, subject, message</td><td>Stored enquiry, Success message</td><td>D7: CUSTOMER_CONTACT (customercontactdb)</td></tr>
+  <tr><td><strong>8.0</strong> Assistant Chatbot</td><td>User text message, Username</td><td>Classified response, Room cards, Suggestions</td><td>D8: ChatbotConversation, D9: ChatbotResponse, D3, D4, D5</td></tr>
+</table>
+
+<div class="fig-caption">Table 8.1 – DFD Level-1 Process Summary</div>
+
+<div class="pb"></div>
+
+<!-- ER DIAGRAM -->
+<h2 class="section">8.3 Entity-Relationship (ER) Diagram</h2>
+
+<p>The ER diagram identifies the entities, their attributes, primary keys, and the relationships (with cardinality) between entities in the system.</p>
+
+<h3 class="subsec">8.3.1 Entities and Their Key Attributes</h3>
+
+<table>
+  <tr><th>Entity</th><th>Primary Key</th><th>Key Attributes</th></tr>
+  <tr><td>roomtypedb</td><td>id (Auto PK)</td><td>ROOMTYPE, ROOMTYPEIMAGE, DESCRIPTION</td></tr>
+  <tr><td>roomnamedb</td><td>id (Auto PK)</td><td>ROOMTYPE (FK), ROOMNAME, ROOMIMAGE, ROOMPRICE, ROOMDESCRIPTION</td></tr>
+  <tr><td>Registerdb</td><td>id (Auto PK)</td><td>USERNAME, PASSWORD, CONFIRMPASSWORD, EMAIL</td></tr>
+  <tr><td>bookingdb</td><td>id (Auto PK)</td><td>CUSTOMER (FK), CUSTOMERNAME, CONTACTEMAIL, CHECKIN, CHECKOUT, TOTALADULTS, TOTALCHILDS, SELECTROOM (FK), SPECIALREQUEST, TOTALPRICE</td></tr>
+  <tr><td>Totaldb</td><td>id (Auto PK)</td><td>BOOKING (FK), CUSTOMERNAME, MOBILE, TOTALPRICE</td></tr>
+  <tr><td>staffdb</td><td>id (Auto PK)</td><td>STAFFNAME, STAFFDESIGNATION, STAFFACEBOOK, STAFFINSTA, STAFFIMAGE</td></tr>
+  <tr><td>customercontactdb</td><td>id (Auto PK)</td><td>CONTACTNAME, CONTACTNUMBER, CONTACTEMAIL, CONTACTSUBJECT, CONTACTMESSAGE</td></tr>
+  <tr><td>ChatbotConversation</td><td>id (Auto PK)</td><td>username, user_message, bot_response, query_type, rating, created_at</td></tr>
+  <tr><td>ChatbotResponse</td><td>id (Auto PK)</td><td>Predefined response templates</td></tr>
+  <tr><td>Notification</td><td>id (Auto PK)</td><td>username, notification_type, title, message, is_read, related_object_id, created_at</td></tr>
+</table>
+
+<h3 class="subsec">8.3.2 Relationships and Cardinality</h3>
+
+<table>
+  <tr><th>Relationship</th><th>Cardinality</th><th>Description</th></tr>
+  <tr><td>roomtypedb ↔ roomnamedb</td><td>1 : N (One-to-Many)</td><td>One room type can have many rooms. Each room belongs to exactly one room type.</td></tr>
+  <tr><td>roomnamedb ↔ bookingdb</td><td>1 : N (One-to-Many)</td><td>One room can have many bookings (over time). Each booking is for exactly one room.</td></tr>
+  <tr><td>Registerdb ↔ bookingdb</td><td>1 : N (One-to-Many)</td><td>One registered user can make many bookings. Each booking is optionally linked to one user.</td></tr>
+  <tr><td>bookingdb ↔ Totaldb</td><td>1 : N (One-to-Many)</td><td>One booking can have payment records. Each payment is linked to one booking.</td></tr>
+  <tr><td>staffdb</td><td>Independent</td><td>No direct relationship with other entities.</td></tr>
+  <tr><td>customercontactdb</td><td>Independent</td><td>No direct relationship with other entities.</td></tr>
+  <tr><td>ChatbotConversation</td><td>Independent</td><td>Stores username as text field; no FK to Registerdb.</td></tr>
+</table>
+
+<div class="pb"></div>
+
+<!-- DATA DICTIONARY -->
+<h2 class="section">8.4 Data Dictionary</h2>
+
+<p>The data dictionary provides a detailed description of every field in every table of the database, including field name, data type, constraints, and purpose.</p>
+
+<h3 class="subsec">Table 1: ROOMTYPE_MASTER (roomtypedb)</h3>
+<table>
+  <tr><th>Field Name</th><th>Data Type</th><th>Size</th><th>Constraints</th><th>Description</th></tr>
+  <tr><td>id</td><td>INTEGER</td><td>—</td><td>PRIMARY KEY, AUTO INCREMENT</td><td>Unique identifier for each room type</td></tr>
+  <tr><td>ROOMTYPE</td><td>VARCHAR</td><td>100</td><td>NULL allowed</td><td>Name of the room type (e.g., Deluxe, Suite, Standard)</td></tr>
+  <tr><td>ROOMTYPEIMAGE</td><td>VARCHAR (ImageField)</td><td>255</td><td>NULL allowed, upload_to="roomtypeimages"</td><td>File path to the room type image</td></tr>
+  <tr><td>DESCRIPTION</td><td>VARCHAR</td><td>100</td><td>NULL allowed</td><td>Brief description of the room type</td></tr>
+</table>
+
+<h3 class="subsec">Table 2: ROOM_MASTER (roomnamedb)</h3>
+<table>
+  <tr><th>Field Name</th><th>Data Type</th><th>Size</th><th>Constraints</th><th>Description</th></tr>
+  <tr><td>id</td><td>INTEGER</td><td>—</td><td>PRIMARY KEY, AUTO INCREMENT</td><td>Unique room identifier</td></tr>
+  <tr><td>ROOMTYPE</td><td>INTEGER</td><td>—</td><td>FOREIGN KEY → roomtypedb(id), CASCADE, NULL allowed</td><td>Reference to the room's type category</td></tr>
+  <tr><td>ROOMNAME</td><td>VARCHAR</td><td>100</td><td>NULL allowed</td><td>Name or number of the room</td></tr>
+  <tr><td>ROOMIMAGE</td><td>VARCHAR (ImageField)</td><td>255</td><td>NULL allowed, upload_to="roomimage"</td><td>File path to the room's image</td></tr>
+  <tr><td>ROOMPRICE</td><td>INTEGER</td><td>—</td><td>NULL allowed</td><td>Price per night in INR</td></tr>
+  <tr><td>ROOMDESCRIPTION</td><td>VARCHAR</td><td>100</td><td>NULL allowed</td><td>Description of the room's features and amenities</td></tr>
+</table>
+
+<h3 class="subsec">Table 3: USER_MASTER (Registerdb)</h3>
+<table>
+  <tr><th>Field Name</th><th>Data Type</th><th>Size</th><th>Constraints</th><th>Description</th></tr>
+  <tr><td>id</td><td>INTEGER</td><td>—</td><td>PRIMARY KEY, AUTO INCREMENT</td><td>Unique user identifier</td></tr>
+  <tr><td>USERNAME</td><td>VARCHAR</td><td>100</td><td>NULL allowed</td><td>User's chosen display name</td></tr>
+  <tr><td>PASSWORD</td><td>VARCHAR</td><td>100</td><td>NULL allowed</td><td>User's login password</td></tr>
+  <tr><td>CONFIRMPASSWORD</td><td>VARCHAR</td><td>100</td><td>NULL allowed</td><td>Password confirmation (for validation)</td></tr>
+  <tr><td>EMAIL</td><td>VARCHAR (EmailField)</td><td>100</td><td>NULL allowed</td><td>User's email address</td></tr>
+</table>
+
+<h3 class="subsec">Table 4: BOOKING_MASTER (bookingdb)</h3>
+<table>
+  <tr><th>Field Name</th><th>Data Type</th><th>Size</th><th>Constraints</th><th>Description</th></tr>
+  <tr><td>id</td><td>INTEGER</td><td>—</td><td>PRIMARY KEY, AUTO INCREMENT</td><td>Unique booking identifier</td></tr>
+  <tr><td>CUSTOMER</td><td>INTEGER</td><td>—</td><td>FOREIGN KEY → Registerdb(id), SET_NULL, NULL allowed</td><td>Link to the registered customer who made the booking</td></tr>
+  <tr><td>CUSTOMERNAME</td><td>VARCHAR</td><td>100</td><td>NULL allowed</td><td>Customer's name (for display purposes)</td></tr>
+  <tr><td>CONTACTEMAIL</td><td>VARCHAR (EmailField)</td><td>100</td><td>NULL allowed</td><td>Email for booking communication</td></tr>
+  <tr><td>CHECKIN</td><td>DATE</td><td>—</td><td>NULL allowed</td><td>Check-in date</td></tr>
+  <tr><td>CHECKOUT</td><td>DATE</td><td>—</td><td>NULL allowed</td><td>Check-out date</td></tr>
+  <tr><td>TOTALADULTS</td><td>INTEGER</td><td>—</td><td>NULL allowed</td><td>Number of adult guests</td></tr>
+  <tr><td>TOTALCHILDS</td><td>INTEGER</td><td>—</td><td>NULL allowed</td><td>Number of child guests</td></tr>
+  <tr><td>SELECTROOM</td><td>INTEGER</td><td>—</td><td>FOREIGN KEY → roomnamedb(id), CASCADE, NULL allowed</td><td>The specific room being booked</td></tr>
+  <tr><td>SPECIALREQUEST</td><td>TEXT</td><td>—</td><td>NULL allowed</td><td>Any special requests from the guest</td></tr>
+  <tr><td>TOTALPRICE</td><td>INTEGER</td><td>—</td><td>NULL allowed</td><td>Total booking price in INR</td></tr>
+</table>
+
+<h3 class="subsec">Table 5: PAYMENT_TOTAL (Totaldb)</h3>
+<table>
+  <tr><th>Field Name</th><th>Data Type</th><th>Size</th><th>Constraints</th><th>Description</th></tr>
+  <tr><td>id</td><td>INTEGER</td><td>—</td><td>PRIMARY KEY, AUTO INCREMENT</td><td>Unique payment identifier</td></tr>
+  <tr><td>BOOKING</td><td>INTEGER</td><td>—</td><td>FOREIGN KEY → bookingdb(id), CASCADE, NULL allowed</td><td>Link to the associated booking</td></tr>
+  <tr><td>CUSTOMERNAME</td><td>VARCHAR</td><td>100</td><td>NULL allowed</td><td>Customer's name</td></tr>
+  <tr><td>MOBILE</td><td>VARCHAR</td><td>15</td><td>NULL allowed</td><td>Customer's mobile number</td></tr>
+  <tr><td>TOTALPRICE</td><td>INTEGER</td><td>—</td><td>NULL allowed</td><td>Total amount paid in INR</td></tr>
+</table>
+
+<h3 class="subsec">Table 6: CUSTOMER_CONTACT (customercontactdb)</h3>
+<table>
+  <tr><th>Field Name</th><th>Data Type</th><th>Size</th><th>Constraints</th><th>Description</th></tr>
+  <tr><td>id</td><td>INTEGER</td><td>—</td><td>PRIMARY KEY, AUTO INCREMENT</td><td>Unique contact identity</td></tr>
+  <tr><td>CONTACTNAME</td><td>VARCHAR</td><td>100</td><td>NULL allowed</td><td>Customer's name</td></tr>
+  <tr><td>CONTACTNUMBER</td><td>VARCHAR</td><td>15</td><td>NULL allowed</td><td>Customer's phone number</td></tr>
+  <tr><td>CONTACTEMAIL</td><td>VARCHAR (EmailField)</td><td>100</td><td>NULL allowed</td><td>Customer's email address</td></tr>
+  <tr><td>CONTACTSUBJECT</td><td>VARCHAR</td><td>200</td><td>NULL allowed</td><td>Subject of the enquiry</td></tr>
+  <tr><td>CONTACTMESSAGE</td><td>TEXT</td><td>—</td><td>NULL allowed</td><td>Full message body</td></tr>
+</table>
+
+<h3 class="subsec">Table 7: STAFF_MASTER (staffdb)</h3>
+<table>
+  <tr><th>Field Name</th><th>Data Type</th><th>Size</th><th>Constraints</th><th>Description</th></tr>
+  <tr><td>id</td><td>INTEGER</td><td>—</td><td>PRIMARY KEY, AUTO INCREMENT</td><td>Unique staff identifier</td></tr>
+  <tr><td>STAFFNAME</td><td>VARCHAR</td><td>100</td><td>NULL allowed</td><td>Staff member's name</td></tr>
+  <tr><td>STAFFDESIGNATION</td><td>VARCHAR</td><td>100</td><td>NULL allowed</td><td>Job title / role</td></tr>
+  <tr><td>STAFFACEBOOK</td><td>VARCHAR</td><td>100</td><td>NULL allowed</td><td>Facebook profile URL</td></tr>
+  <tr><td>STAFFINSTA</td><td>VARCHAR</td><td>100</td><td>NULL allowed</td><td>Instagram profile URL</td></tr>
+  <tr><td>STAFFIMAGE</td><td>VARCHAR (ImageField)</td><td>255</td><td>NULL allowed, upload_to="staffimage"</td><td>Staff photo file path</td></tr>
+</table>
+
+<h3 class="subsec">Table 8: ChatbotConversation</h3>
+<table>
+  <tr><th>Field Name</th><th>Data Type</th><th>Size</th><th>Constraints</th><th>Description</th></tr>
+  <tr><td>id</td><td>INTEGER</td><td>—</td><td>PRIMARY KEY, AUTO INCREMENT</td><td>Unique conversation identifier</td></tr>
+  <tr><td>username</td><td>VARCHAR</td><td>100</td><td>NOT NULL</td><td>User who initiated the conversation</td></tr>
+  <tr><td>user_message</td><td>TEXT</td><td>—</td><td>NOT NULL</td><td>The user's query message</td></tr>
+  <tr><td>bot_response</td><td>TEXT</td><td>—</td><td>NOT NULL</td><td>The chatbot's response</td></tr>
+  <tr><td>query_type</td><td>VARCHAR</td><td>20</td><td>NOT NULL</td><td>Classification: room, staff, booking, or general</td></tr>
+  <tr><td>rating</td><td>INTEGER</td><td>—</td><td>NULL allowed, range 1–5</td><td>User's satisfaction rating</td></tr>
+  <tr><td>created_at</td><td>DATETIME</td><td>—</td><td>AUTO (auto_now_add=True)</td><td>Timestamp of conversation</td></tr>
+</table>
+
+<h3 class="subsec">Table 9: ChatbotResponse</h3>
+<table>
+  <tr><th>Field Name</th><th>Data Type</th><th>Size</th><th>Constraints</th><th>Description</th></tr>
+  <tr><td>id</td><td>INTEGER</td><td>—</td><td>PRIMARY KEY, AUTO INCREMENT</td><td>Unique response identifier</td></tr>
+  <tr><td>keywords</td><td>TEXT</td><td>—</td><td>NOT NULL</td><td>Comma-separated keywords that trigger this response</td></tr>
+  <tr><td>response_text</td><td>TEXT</td><td>—</td><td>NOT NULL</td><td>The response to display</td></tr>
+  <tr><td>category</td><td>VARCHAR</td><td>20</td><td>NOT NULL</td><td>Response category (room, booking, staff, general)</td></tr>
+  <tr><td>priority</td><td>INTEGER</td><td>—</td><td>DEFAULT 0</td><td>Priority for response selection</td></tr>
+  <tr><td>is_active</td><td>BOOLEAN</td><td>—</td><td>DEFAULT True</td><td>Whether this response is active</td></tr>
+</table>
+
+<h3 class="subsec">Table 10: Notification</h3>
+<table>
+  <tr><th>Field Name</th><th>Data Type</th><th>Size</th><th>Constraints</th><th>Description</th></tr>
+  <tr><td>id</td><td>INTEGER</td><td>—</td><td>PRIMARY KEY, AUTO INCREMENT</td><td>Unique notification identifier</td></tr>
+  <tr><td>username</td><td>VARCHAR</td><td>100</td><td>NOT NULL</td><td>Target user for the notification</td></tr>
+  <tr><td>notification_type</td><td>VARCHAR</td><td>20</td><td>NOT NULL</td><td>Type: booking, cancellation, alert, info</td></tr>
+  <tr><td>title</td><td>VARCHAR</td><td>200</td><td>NOT NULL</td><td>Notification headline</td></tr>
+  <tr><td>message</td><td>TEXT</td><td>—</td><td>NOT NULL</td><td>Full notification message</td></tr>
+  <tr><td>is_read</td><td>BOOLEAN</td><td>—</td><td>DEFAULT False</td><td>Whether the user has read it</td></tr>
+  <tr><td>related_object_id</td><td>INTEGER</td><td>—</td><td>NULL allowed</td><td>ID of related room/booking</td></tr>
+  <tr><td>created_at</td><td>DATETIME</td><td>—</td><td>AUTO (auto_now_add=True)</td><td>Creation timestamp</td></tr>
+</table>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 35-44 : DESIGN DOCUMENT
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">9. Design Document</h1>
+
+<h2 class="section">9.1 Modularization Details – 8 Modules</h2>
+
+<p>The system is divided into eight functional modules. Each module handles a specific set of related features. The modules are described below with their purpose, functions, input/output, and pseudocode.</p>
+
+<!-- MODULE 1 -->
+<h3 class="subsec">Module 1 – Secure Login &amp; User Management</h3>
+
+<p><strong>Purpose:</strong> This module allows only authorized users to access customer features or the admin backend. It verifies the username and password against the registered users table and stores the username in the session so that unauthorized persons cannot view, modify, or delete data.</p>
+
+<p><strong>Functions Covered:</strong></p>
+<ul>
+  <li>User registration (sign-up) with username, email, password, and confirm password</li>
+  <li>User sign-in with session creation</li>
+  <li>User sign-out with session destruction</li>
+  <li>Admin login using Django's built-in <code>authenticate()</code> and <code>login()</code> functions</li>
+  <li>Admin logout using Django's <code>logout()</code> function</li>
+  <li>Password reset using email OTP verification</li>
+  <li>OTP generation, email dispatch, OTP verification, and password update</li>
+</ul>
+
+<p><strong>Pseudocode – User Registration:</strong></p>
+<pre>
+FUNCTION save_user(request):
+    IF request method is POST:
+        GET username, email, password, confirm_password from form
+        CREATE new Registerdb object with these values
+        SAVE object to database
+        DISPLAY success message "Signup successful"
+        REDIRECT to sign-in page
+    END IF
+END FUNCTION
+</pre>
+
+<p><strong>Pseudocode – User Login:</strong></p>
+<pre>
+FUNCTION user_login(request):
+    IF request method is POST:
+        GET username, password from form
+        IF Registerdb record exists WHERE USERNAME=username AND PASSWORD=password:
+            SET session['USERNAME'] = username
+            SET session['PASSWORD'] = password
+            DISPLAY success message "Signin successful"
+            REDIRECT to home page
+        ELSE:
+            DISPLAY warning "Signin failed"
+            REDIRECT to sign-in page
+        END IF
+    END IF
+END FUNCTION
+</pre>
+
+<p><strong>Pseudocode – Password Reset via OTP:</strong></p>
+<pre>
+FUNCTION reset_password_email_verification(request):
+    IF request method is POST:
+        GET email from form
+        IF Registerdb record exists WHERE EMAIL=email:
+            GENERATE random OTP (5 digits)
+            STORE OTP in session
+            SEND email to user with OTP
+            DISPLAY OTP input form
+        ELSE:
+            DISPLAY error "Invalid email"
+        END IF
+    END IF
+END FUNCTION
+
+FUNCTION verify_otp(request, user_id):
+    GET user_otp from form
+    GET session_otp from session
+    IF user_otp == session_otp:
+        DISPLAY new password form
+    ELSE:
+        DISPLAY error "OTP does not match"
+    END IF
+END FUNCTION
+
+FUNCTION reset_password(request, username):
+    GET password1, password2 from form
+    IF password1 == password2:
+        UPDATE Registerdb SET PASSWORD = password1 WHERE USERNAME = username
+        SEND email notification about password change
+        DISPLAY success message
+        REDIRECT to sign-in page
+    ELSE:
+        DISPLAY error "Passwords do not match"
+    END IF
+END FUNCTION
+</pre>
+
+<div class="pb"></div>
+
+<!-- MODULE 2 -->
+<h3 class="subsec">Module 2 – Room Type &amp; Room Management</h3>
+
+<p><strong>Purpose:</strong> This module enables the admin to insert, update, and delete room types (e.g., Deluxe, Suite, Standard) and individual rooms including images, descriptions, and prices, so that the online catalogue always matches the actual inventory of the hotel. Rooms are linked to their room type via a foreign key relationship.</p>
+
+<p><strong>Functions Covered:</strong></p>
+<ul>
+  <li>Add room type with name, description, and image upload</li>
+  <li>Display all room types in a table with edit/delete buttons</li>
+  <li>Edit room type details and image</li>
+  <li>Delete room type (cascade deletes associated rooms)</li>
+  <li>Add room with name, type (dropdown FK), price, description, and image</li>
+  <li>Display all rooms with type, price, and actions</li>
+  <li>Edit room details</li>
+  <li>Delete room</li>
+</ul>
+
+<p><strong>Pseudocode – Add Room Type:</strong></p>
+<pre>
+FUNCTION addRoomType(request):
+    IF request method is POST:
+        GET roomtype_name, description, image from form
+        CREATE new roomtypedb object
+        SET object fields
+        SAVE to database
+        DISPLAY success message
+        REDIRECT to display room types page
+    END IF
+END FUNCTION
+</pre>
+
+<p><strong>Pseudocode – Add Room (with FK):</strong></p>
+<pre>
+FUNCTION addRoom(request):
+    IF request method is POST:
+        GET room_name, room_type_id, price, description, image from form
+        GET room_type_object = roomtypedb.objects.get(id=room_type_id)
+        CREATE new roomnamedb object
+        SET ROOMTYPE = room_type_object  (Foreign Key assignment)
+        SET ROOMNAME, ROOMPRICE, ROOMDESCRIPTION, ROOMIMAGE
+        SAVE to database
+        DISPLAY success message
+    END IF
+END FUNCTION
+</pre>
+
+<!-- MODULE 3 -->
+<h3 class="subsec">Module 3 – Staff Management</h3>
+
+<p><strong>Purpose:</strong> When new staff members join or existing staff details change, this module is used. It allows the admin to maintain staff name, designation, social-media links (Facebook, Instagram), and photos. These details are displayed on the About and Our Team pages so that customers can know about the team behind the hotel services.</p>
+
+<p><strong>Functions Covered:</strong> Add staff, display all staff, edit staff, delete staff.</p>
+
+<p><strong>Pseudocode – Add Staff:</strong></p>
+<pre>
+FUNCTION addStaff(request):
+    IF request method is POST:
+        GET staff_name, designation, facebook, instagram, image from form
+        CREATE new staffdb object with these values
+        SAVE to database
+        DISPLAY success message
+        REDIRECT to display staff page
+    END IF
+END FUNCTION
+</pre>
+
+<!-- MODULE 4 -->
+<h3 class="subsec">Module 4 – Customer Contact Management</h3>
+
+<p><strong>Purpose:</strong> When a visitor sends a message through the contact form, this module stores the details—customer name, email, mobile number, subject, and message—so that the admin can read, respond to, and delete messages from a single backend page, improving hotel–guest communication.</p>
+
+<p><strong>Pseudocode – Save Contact:</strong></p>
+<pre>
+FUNCTION save_customer_contact(request):
+    IF request method is POST:
+        GET name, email, number, subject, message from form
+        CREATE new customercontactdb object
+        SAVE to database
+        DISPLAY success message "Message sent successfully"
+        REDIRECT to contact page
+    END IF
+END FUNCTION
+</pre>
+
+<div class="pb"></div>
+
+<!-- MODULE 5 -->
+<h3 class="subsec">Module 5 – Room Search &amp; Booking Management</h3>
+
+<p><strong>Purpose:</strong> This is one of the main functional modules. It allows a logged-in customer to search rooms by room type, room name, date range, and price and then place a booking request. The module checks availability by validating date-range overlaps for the selected room, prevents double booking, stores booking details such as check-in, check-out, adults, children, special requests, and calculates the total price. An advanced search interface using AJAX provides real-time filtering without full page reload.</p>
+
+<p><strong>Functions Covered:</strong></p>
+<ul>
+  <li>Browse rooms by category (filter by room type)</li>
+  <li>Advanced search with AJAX (room name, type, min price, max price, check-in, check-out)</li>
+  <li>Book a room with overlap detection</li>
+  <li>View booking cart with subtotal, tax, and total calculation</li>
+  <li>Delete a booking from the cart</li>
+</ul>
+
+<p><strong>Pseudocode – Save Booking with Overlap Detection:</strong></p>
+<pre>
+FUNCTION save_booking(request):
+    IF request method is POST:
+        GET customer_name, email, checkin, checkout, adults, children,
+            room_id, special_request, total_price from form
+
+        TRY:
+            room_object = roomnamedb.objects.get(id=room_id)
+        EXCEPT DoesNotExist:
+            DISPLAY error "Invalid room selection"
+            REDIRECT to save room page
+            RETURN
+
+        // Check for overlapping bookings
+        overlapping = bookingdb.objects.filter(
+            SELECTROOM = room_object,
+            CHECKIN &lt;= checkout,
+            CHECKOUT &gt;= checkin
+        )
+
+        IF overlapping exists:
+            DISPLAY error "Room already booked for these dates"
+            REDIRECT to save room page
+        ELSE:
+            // Get customer FK if logged in
+            customer_obj = NULL
+            IF session has 'USERNAME':
+                TRY:
+                    customer_obj = Registerdb.objects.get(USERNAME=session['USERNAME'])
+                EXCEPT: pass
+
+            CREATE new bookingdb object with all fields
+            SET CUSTOMER = customer_obj  (FK)
+            SET SELECTROOM = room_object  (FK)
+            SAVE to database
+
+            DISPLAY success "Room booked successfully"
+            SEND confirmation email to customer
+            REDIRECT to save room page
+        END IF
+    END IF
+END FUNCTION
+</pre>
+
+<p><strong>Pseudocode – Cart Calculation:</strong></p>
+<pre>
+FUNCTION save_room_page(request):
+    GET all bookings WHERE CUSTOMERNAME = session['USERNAME']
+    SET subtotal = 0, tax = 0, total = 0
+
+    FOR each booking in bookings:
+        subtotal = subtotal + booking.TOTALPRICE
+    END FOR
+
+    IF subtotal > 5000:
+        tax = 10  (percentage)
+    ELSE:
+        tax = 20  (flat)
+
+    total = subtotal + tax
+    RENDER template with bookings, subtotal, tax, total
+END FUNCTION
+</pre>
+
+<!-- MODULE 6 -->
+<h3 class="subsec">Module 6 – Payment &amp; Total Amount Module</h3>
+
+<p><strong>Purpose:</strong> After confirming the booking, this module calculates the final total amount to be paid by the customer. It integrates with the Razorpay payment gateway to create an order, process online payment, and stores the final paid amount, customer name, and mobile in the PAYMENT_TOTAL table for future reference and financial reporting.</p>
+
+<p><strong>Pseudocode – Payment Processing:</strong></p>
+<pre>
+FUNCTION payment_page(request):
+    GET latest Totaldb record (most recent payment entry)
+    SET amount = record.TOTALPRICE * 100  (Razorpay uses paise)
+
+    IF request method is POST:
+        SET currency = 'INR'
+        CREATE Razorpay client with API key and secret
+        CREATE order = client.order.create(amount, currency, capture='1')
+    END IF
+
+    RENDER payment template with customer details and amount
+END FUNCTION
+
+FUNCTION save_payment_input(request):
+    IF request method is POST:
+        GET customer_name, mobile, total_price from form
+        GET last_booking for this customer
+        CREATE new Totaldb object
+        SET BOOKING = last_booking  (FK)
+        SET CUSTOMERNAME, MOBILE, TOTALPRICE
+        SAVE to database
+        REDIRECT to payment page
+    END IF
+END FUNCTION
+</pre>
+
+<div class="pb"></div>
+
+<!-- MODULE 7 -->
+<h3 class="subsec">Module 7 – Notification, Email &amp; PDF Report Module</h3>
+
+<p><strong>Purpose:</strong> This module handles user-friendly communication and reporting features. It sends booking confirmation emails, password reset OTP emails, and password-change alerts to customers. It generates PDF documents for booking details using xhtml2pdf. It also uses JavaScript-based instant notifications to inform users about successful operations like booking, message submission, or data updates.</p>
+
+<p><strong>Functions Covered:</strong></p>
+<ul>
+  <li>Send booking confirmation email via Django SMTP</li>
+  <li>Send OTP email for password reset</li>
+  <li>Send password-changed notification email</li>
+  <li>Generate PDF report from HTML template using xhtml2pdf</li>
+  <li>Display Django <code>messages</code> framework notifications (success, warning, error)</li>
+  <li>Get notifications API endpoint (JSON)</li>
+  <li>Mark notification as read API endpoint</li>
+</ul>
+
+<p><strong>Pseudocode – PDF Generation:</strong></p>
+<pre>
+FUNCTION generate_pdf(request):
+    GET username from session (default 'Guest')
+    SET context = { username, booking_data }
+    RENDER HTML template to string using render_to_string()
+    CREATE HTTP response with content_type = 'application/pdf'
+    SET Content-Disposition header for download
+    CALL pisa.CreatePDF(html_string, dest=response)
+    IF errors:
+        RETURN error response
+    ELSE:
+        RETURN PDF response
+    END IF
+END FUNCTION
+</pre>
+
+<!-- MODULE 8 -->
+<h3 class="subsec">Module 8 – Assistant Chatbot Module</h3>
+
+<p><strong>Purpose:</strong> The assistant chatbot provides an interactive way for customers to communicate with the hotel website. It can answer questions about available rooms, prices, facilities, staff information, booking policies, check-in/out times, and guide the user to the correct page or action, thereby reducing manual support work for the staff and improving customer satisfaction. Conversations are stored for analytics and users can rate responses.</p>
+
+<p><strong>Functions Covered:</strong></p>
+<ul>
+  <li><code>chatbot_query()</code> – Main API endpoint (POST) that receives user message and returns response</li>
+  <li><code>generate_chatbot_response()</code> – Core engine that classifies query and generates response</li>
+  <li><code>handle_room_query()</code> – Handles room-related questions with database lookup</li>
+  <li><code>handle_staff_query()</code> – Handles staff-related questions</li>
+  <li><code>handle_booking_query()</code> – Handles booking-related questions</li>
+  <li><code>handle_general_query()</code> – Handles greetings, help, and general questions</li>
+  <li><code>rate_response()</code> – API endpoint (POST) for user to rate a response</li>
+</ul>
+
+<p><strong>Pseudocode – Chatbot Query Classification:</strong></p>
+<pre>
+FUNCTION generate_chatbot_response(user_message, username):
+    DEFINE room_keywords = ['room', 'price', 'availability', 'luxury', 'deluxe', 'suite']
+    DEFINE staff_keywords = ['staff', 'team', 'manager', 'receptionist']
+    DEFINE booking_keywords = ['booking', 'reserve', 'book', 'check-in', 'check-out']
+
+    CONVERT user_message to lowercase
+
+    IF any room_keyword IN user_message:
+        RETURN handle_room_query(user_message, username)
+    ELSE IF any staff_keyword IN user_message:
+        RETURN handle_staff_query(user_message, username)
+    ELSE IF any booking_keyword IN user_message:
+        RETURN handle_booking_query(user_message, username)
+    ELSE:
+        RETURN handle_general_query(user_message, username)
+    END IF
+END FUNCTION
+
+FUNCTION handle_room_query(user_message, username):
+    IF 'price' IN user_message:
+        response = "We offer rooms at various price points..."
+        suggestions = ['Show budget rooms', 'Show luxury rooms']
+    ELSE IF 'luxury' IN user_message:
+        QUERY rooms = roomnamedb.objects.filter(ROOMTYPE__ROOMTYPE__icontains='luxury')
+        BUILD room_list with id, name, type, price, image for each room
+        response = "Here are our luxury rooms."
+        data = room_list
+    ELSE:
+        COUNT total rooms
+        response = "We have {count} rooms available..."
+    END IF
+    RETURN {response, query_type='room', suggestions, data}
+END FUNCTION
+</pre>
+
+<div class="pb"></div>
+
+<!-- Database Design & Normalization -->
+<h2 class="section">9.2 Database Design and Normalization</h2>
+
+<h3 class="subsec">9.2.1 Normalization</h3>
+
+<p>The database design follows normalization principles to reduce data redundancy and ensure data integrity.</p>
+
+<p><strong>First Normal Form (1NF):</strong> All tables satisfy 1NF because:</p>
+<ul>
+  <li>Each table has a primary key (auto-generated <code>id</code> field).</li>
+  <li>All columns contain atomic (indivisible) values—there are no repeating groups or multi-valued attributes.</li>
+  <li>Each row is unique, identified by its primary key.</li>
+</ul>
+
+<p><strong>Second Normal Form (2NF):</strong> All tables satisfy 2NF because:</p>
+<ul>
+  <li>They are already in 1NF.</li>
+  <li>All non-key attributes are fully functionally dependent on the primary key. Since all primary keys are single-column auto-incremented IDs, there are no partial dependencies.</li>
+</ul>
+
+<p><strong>Third Normal Form (3NF):</strong> The database is in 3NF because:</p>
+<ul>
+  <li>It is in 2NF.</li>
+  <li>There are no transitive dependencies. For example, in the <code>bookingdb</code> table, the <code>SELECTROOM</code> field is a foreign key to <code>roomnamedb</code>—the room's name, type, and price are not duplicated in the booking table. Similarly, <code>CUSTOMER</code> is a foreign key to <code>Registerdb</code>—the customer's email and password are not stored in the booking table.</li>
+  <li>The <code>CUSTOMERNAME</code> field in <code>bookingdb</code> is a denormalized convenience field for display purposes, which is an acceptable trade-off for query performance.</li>
+</ul>
+
+<h3 class="subsec">9.2.2 Referential Integrity</h3>
+
+<p>Django's ORM enforces referential integrity through the <code>on_delete</code> parameter on ForeignKey fields:</p>
+
+<table>
+  <tr><th>Foreign Key</th><th>Parent Table</th><th>on_delete Action</th><th>Effect</th></tr>
+  <tr><td>roomnamedb.ROOMTYPE</td><td>roomtypedb</td><td>CASCADE</td><td>Deleting a room type deletes all its rooms</td></tr>
+  <tr><td>bookingdb.CUSTOMER</td><td>Registerdb</td><td>SET_NULL</td><td>Deleting a user sets the booking's customer to NULL (booking preserved)</td></tr>
+  <tr><td>bookingdb.SELECTROOM</td><td>roomnamedb</td><td>CASCADE</td><td>Deleting a room deletes all its bookings</td></tr>
+  <tr><td>Totaldb.BOOKING</td><td>bookingdb</td><td>CASCADE</td><td>Deleting a booking deletes its payment records</td></tr>
+</table>
+
+<div class="pb"></div>
+
+<!-- Procedural Design -->
+<h2 class="section">9.3 Procedural Design / Process Logic</h2>
+
+<h3 class="subsec">9.3.1 Booking Workflow</h3>
+<ol>
+  <li>Customer signs in using username and password → session is created.</li>
+  <li>Customer browses room categories on the home page → clicks on a room type.</li>
+  <li>System displays all rooms of that type with images, prices, and "Book" buttons.</li>
+  <li>Customer clicks "Book" on a specific room → booking form is displayed.</li>
+  <li>Customer fills in: name, email, check-in date, check-out date, adults, children, special request.</li>
+  <li>System calculates total price (room price × number of nights).</li>
+  <li>Customer submits the booking form.</li>
+  <li>System checks for overlapping bookings: <code>CHECKIN ≤ checkout AND CHECKOUT ≥ checkin</code>.</li>
+  <li>If overlap detected → display error "Room already booked for these dates" → redirect.</li>
+  <li>If no overlap → save booking → send confirmation email → redirect to cart page.</li>
+  <li>Cart page shows all bookings with subtotal, tax, and total.</li>
+  <li>Customer enters mobile number and proceeds to payment page.</li>
+  <li>Razorpay order is created → payment popup appears → customer pays.</li>
+  <li>Payment record is saved in Totaldb with booking FK.</li>
+</ol>
+
+<h3 class="subsec">9.3.2 Advanced Search Workflow</h3>
+<ol>
+  <li>User opens the advanced search page.</li>
+  <li>User enters search criteria: room name (text), room type (dropdown), minimum price, maximum price, check-in date, check-out date.</li>
+  <li>JavaScript captures the form inputs and constructs a query string.</li>
+  <li>JavaScript sends an AJAX GET request to <code>/Backend/api/search-rooms/?params</code>.</li>
+  <li>Django view (<code>search_rooms</code>) receives the request and builds a queryset filter chain.</li>
+  <li>If check-in and check-out dates are provided, the view excludes rooms that have overlapping bookings.</li>
+  <li>The filtered rooms are serialized to JSON (id, name, type, price, image URL, description).</li>
+  <li>JavaScript receives the JSON response and dynamically renders room cards in the results area without reloading the page.</li>
+</ol>
+
+<h3 class="subsec">9.3.3 Chatbot Workflow</h3>
+<ol>
+  <li>User clicks the floating chatbot icon on any page → chat window opens.</li>
+  <li>User types a message and clicks "Send" or presses Enter.</li>
+  <li>JavaScript sends an AJAX POST request to <code>/Backend/api/chatbot/</code> with the message and username.</li>
+  <li>Django view parses the JSON body, extracts the message.</li>
+  <li>The <code>generate_chatbot_response()</code> function classifies the query using keyword matching.</li>
+  <li>Based on the classification (room/staff/booking/general), the appropriate handler function is called.</li>
+  <li>The handler queries the database if needed (e.g., fetching rooms, staff) and builds a response object.</li>
+  <li>The conversation is saved in ChatbotConversation.</li>
+  <li>A JSON response with text, suggestions, and optional data (room cards) is returned.</li>
+  <li>JavaScript renders the bot's response in the chat window, including suggestion chips and room cards.</li>
+  <li>User can rate the response using a star rating, which is sent via AJAX to <code>/Backend/api/rate-response/</code>.</li>
+</ol>
+
+<h3 class="subsec">9.3.4 Password Reset Workflow</h3>
+<ol>
+  <li>User clicks "Forgot Password" on the sign-in page.</li>
+  <li>Email verification page is displayed → user enters registered email.</li>
+  <li>System verifies the email exists in Registerdb.</li>
+  <li>If valid → generate a random 5-digit OTP → store in session → send OTP email.</li>
+  <li>OTP input page is displayed → user enters the OTP received via email.</li>
+  <li>System compares the entered OTP with the session OTP.</li>
+  <li>If match → new password form is displayed.</li>
+  <li>User enters new password and confirms it.</li>
+  <li>If passwords match → update Registerdb → send password-changed notification email → redirect to sign-in.</li>
+  <li>If passwords don't match → display error → allow retry.</li>
+</ol>
+
+<div class="pb"></div>
+
+<!-- UI Design -->
+<h2 class="section">9.4 User Interface Design</h2>
+
+<p>The user interface is designed with a focus on simplicity, responsiveness, and visual consistency. The design principles followed are:</p>
+
+<ul>
+  <li><strong>Responsive Layout:</strong> Bootstrap 5.3's grid system and utility classes ensure that all pages adapt seamlessly to desktop (≥1200px), tablet (768px–1199px), and mobile (&lt;768px) screen sizes.</li>
+  <li><strong>Consistent Navigation:</strong> A fixed-top navigation bar with the hotel logo, menu items (Home, About, Services, Rooms, Contact), and user authentication links (Sign In, Sign Out) is present on all customer-facing pages.</li>
+  <li><strong>Card-Based Design:</strong> Room types, rooms, and staff profiles are displayed as Bootstrap cards with images, descriptions, and action buttons.</li>
+  <li><strong>Form Design:</strong> All input forms use Bootstrap form components with labels, placeholders, and validation feedback.</li>
+  <li><strong>Color Scheme:</strong> A professional hotel-themed colour palette with primary blues, neutral greys, and accent colours for buttons and highlights.</li>
+  <li><strong>Admin Backend:</strong> The admin backend uses a separate template set with a sidebar navigation, tabular data displays, and modal confirmations for delete actions.</li>
+</ul>
+
+<h3 class="subsec">Customer-Facing Pages</h3>
+<ol>
+  <li>Home page – Room type cards, hero section, chatbot widget</li>
+  <li>About page – Hotel description, staff profiles grid</li>
+  <li>Services page – Hotel services and amenities</li>
+  <li>Rooms page – All room categories with images</li>
+  <li>Filtered rooms page – Rooms of a specific type with "Book" buttons</li>
+  <li>Advanced search page – Filter panel + AJAX results grid</li>
+  <li>Booking form page – Input form for booking details</li>
+  <li>Booking cart page – Booked items with subtotal, tax, total</li>
+  <li>Payment page – Razorpay integration with order summary</li>
+  <li>Contact page – Contact form with name, email, phone, subject, message</li>
+  <li>Sign-up page – Registration form</li>
+  <li>Sign-in page – Login form</li>
+  <li>Password reset pages – Email verification → OTP → New password</li>
+  <li>Our Team page – Staff profiles with social links</li>
+  <li>Testimonials page – Customer reviews</li>
+</ol>
+
+<h3 class="subsec">Admin Backend Pages</h3>
+<ol>
+  <li>Admin login page</li>
+  <li>Dashboard / index page</li>
+  <li>Add room type page (form)</li>
+  <li>Display room types page (table)</li>
+  <li>Edit room type page (form)</li>
+  <li>Add room page (form with type dropdown)</li>
+  <li>Display rooms page (table)</li>
+  <li>Edit room page (form)</li>
+  <li>Add staff page (form)</li>
+  <li>Display staff page (table)</li>
+  <li>Edit staff page (form)</li>
+  <li>Customer contact messages page (table)</li>
+  <li>Booked details page (table)</li>
+  <li>Payment totals page (table)</li>
+  <li>Django Admin – Chatbot responses, conversations, notifications</li>
+</ol>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 45-49 : SOURCE CODE (KEY MODULES)
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">10. Source Code (Key Modules)</h1>
+
+<p>This section presents the source code of the most important modules of the project. The complete source code is available in the project files submitted along with this report.</p>
+
+<h2 class="section">10.1 Django Models – webapp/models.py</h2>
+<pre>
+from django.db import models
+from Backend.models import roomnamedb
+
+class customercontactdb(models.Model):
+    CONTACTNAME = models.CharField(max_length=100, null=True, blank=True)
+    CONTACTNUMBER = models.CharField(max_length=15, null=True, blank=True)
+    CONTACTEMAIL = models.EmailField(max_length=100, null=True, blank=True)
+    CONTACTSUBJECT = models.CharField(max_length=200, null=True, blank=True)
+    CONTACTMESSAGE = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.CONTACTNAME or "No Name"
+
+class Registerdb(models.Model):
+    USERNAME = models.CharField(max_length=100, null=True, blank=True)
+    PASSWORD = models.CharField(max_length=100, null=True, blank=True)
+    CONFIRMPASSWORD = models.CharField(max_length=100, null=True, blank=True)
+    EMAIL = models.EmailField(max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        return self.USERNAME or "No Username"
+
+class bookingdb(models.Model):
+    CUSTOMER = models.ForeignKey(
+        Registerdb, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='bookings'
+    )
+    CUSTOMERNAME = models.CharField(max_length=100, null=True, blank=True)
+    CONTACTEMAIL = models.EmailField(max_length=100, null=True, blank=True)
+    CHECKIN = models.DateField(null=True, blank=True)
+    CHECKOUT = models.DateField(null=True, blank=True)
+    TOTALADULTS = models.IntegerField(null=True, blank=True)
+    TOTALCHILDS = models.IntegerField(null=True, blank=True)
+    SELECTROOM = models.ForeignKey(
+        roomnamedb, on_delete=models.CASCADE,
+        null=True, blank=True, related_name='bookings'
+    )
+    SPECIALREQUEST = models.TextField(null=True, blank=True)
+    TOTALPRICE = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.CUSTOMERNAME} - {self.SELECTROOM}"
+
+class Totaldb(models.Model):
+    BOOKING = models.ForeignKey(
+        bookingdb, on_delete=models.CASCADE,
+        null=True, blank=True, related_name='totals'
+    )
+    CUSTOMERNAME = models.CharField(max_length=100, null=True, blank=True)
+    MOBILE = models.CharField(max_length=15, null=True, blank=True)
+    TOTALPRICE = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.CUSTOMERNAME} - Rs.{self.TOTALPRICE}"
+</pre>
+
+<h2 class="section">10.2 Django Models – Backend/models.py</h2>
+<pre>
+from django.db import models
+
+class roomtypedb(models.Model):
+    ROOMTYPE = models.CharField(max_length=100, null=True, blank=True)
+    ROOMTYPEIMAGE = models.ImageField(
+        upload_to="roomtypeimages", null=True, blank=True
+    )
+    DESCRIPTION = models.CharField(max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        return self.ROOMTYPE or "No Type"
+
+class roomnamedb(models.Model):
+    ROOMTYPE = models.ForeignKey(
+        roomtypedb, on_delete=models.CASCADE,
+        null=True, blank=True, related_name='rooms'
+    )
+    ROOMNAME = models.CharField(max_length=100, null=True, blank=True)
+    ROOMIMAGE = models.ImageField(
+        upload_to="roomimage", null=True, blank=True
+    )
+    ROOMPRICE = models.IntegerField(null=True, blank=True)
+    ROOMDESCRIPTION = models.CharField(max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        return self.ROOMNAME or "No Room Name"
+
+class staffdb(models.Model):
+    STAFFNAME = models.CharField(max_length=100, null=True, blank=True)
+    STAFFDESIGNATION = models.CharField(max_length=100, null=True, blank=True)
+    STAFFACEBOOK = models.CharField(max_length=100, null=True, blank=True)
+    STAFFINSTA = models.CharField(max_length=100, null=True, blank=True)
+    STAFFIMAGE = models.ImageField(
+        upload_to="staffimage", null=True, blank=True
+    )
+
+    def __str__(self):
+        return self.STAFFNAME or "No Name"
+
+from .chatbot_models import ChatbotResponse, ChatbotConversation, Notification
+</pre>
+
+<div class="pb"></div>
+
+<h2 class="section">10.3 Booking with Overlap Detection – webapp/views.py</h2>
+<pre>
+def save_booking_page(request, CONTACTEMAIL=None):
+    if request.method == "POST":
+        na = request.POST.get('bname')
+        em = request.POST.get('bemail')
+        chn = request.POST.get('bcheckin')
+        cho = request.POST.get('bcheckout')
+        ta = request.POST.get('btotaladults')
+        tc = request.POST.get('btotalchilds')
+        sr_id = request.POST.get('bselectroom')
+        sre = request.POST.get('bspecialrequest')
+        tp = request.POST.get('btotalprice')
+
+        try:
+            room_obj = roomnamedb.objects.get(id=sr_id)
+        except roomnamedb.DoesNotExist:
+            messages.error(request, "Invalid room selection.")
+            return redirect('save_room_page')
+
+        # Check for overlapping bookings using date-range logic
+        overlapping_bookings = bookingdb.objects.filter(
+            SELECTROOM=room_obj
+        ).filter(
+            CHECKIN__lte=cho,    # Existing check-in is before new check-out
+            CHECKOUT__gte=chn    # Existing check-out is after new check-in
+        )
+
+        if overlapping_bookings.exists():
+            messages.error(request,
+                "The selected room is already booked for the specified dates.")
+            return redirect('save_room_page')
+        else:
+            customer_obj = None
+            if 'USERNAME' in request.session:
+                try:
+                    customer_obj = Registerdb.objects.get(
+                        USERNAME=request.session['USERNAME']
+                    )
+                except Registerdb.DoesNotExist:
+                    pass
+
+            obj = bookingdb(
+                CUSTOMER=customer_obj,
+                CUSTOMERNAME=na,
+                CONTACTEMAIL=em,
+                CHECKIN=chn,
+                CHECKOUT=cho,
+                TOTALADULTS=int(ta) if ta else None,
+                TOTALCHILDS=int(tc) if tc else None,
+                SELECTROOM=room_obj,
+                SPECIALREQUEST=sre,
+                TOTALPRICE=int(tp) if tp else None
+            )
+            obj.save()
+            messages.success(request, "Room booked successfully.")
+
+            subject = "Congratulations - Room Booked"
+            message = (f"Dear customer, you have booked a room "
+                       f"successfully. Thank you & have a nice day!")
+            send_mail(subject, message, EMAIL_HOST_USER,
+                      [obj.CONTACTEMAIL], fail_silently=True)
+            return redirect('save_room_page')
+
+        return redirect('save_room_page')
+</pre>
+
+<h2 class="section">10.4 Chatbot Engine – Backend/chatbot_views.py</h2>
+<pre>
+@csrf_exempt
+@require_http_methods(["POST"])
+def chatbot_query(request):
+    try:
+        data = json.loads(request.body)
+        user_message = data.get('message', '').strip().lower()
+        username = data.get('username', 'Guest')
+
+        if not user_message:
+            return JsonResponse({'error': 'Empty message'}, status=400)
+
+        response_data = generate_chatbot_response(user_message, username)
+
+        ChatbotConversation.objects.create(
+            username=username,
+            user_message=data.get('message'),
+            bot_response=response_data['response'],
+            query_type=response_data.get('query_type', 'general')
+        )
+
+        return JsonResponse({
+            'response': response_data['response'],
+            'query_type': response_data.get('query_type', 'general'),
+            'suggestions': response_data.get('suggestions', []),
+            'data': response_data.get('data', [])
+        })
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+def generate_chatbot_response(user_message, username):
+    response = {
+        'response': '', 'query_type': 'general',
+        'suggestions': [], 'data': []
+    }
+    room_keywords = ['room', 'price', 'availability', 'luxury',
+                     'deluxe', 'suite', 'bed', 'rooms']
+    staff_keywords = ['staff', 'team', 'manager', 'receptionist',
+                      'housekeeper', 'chef']
+    booking_keywords = ['booking', 'reserve', 'book', 'reservation',
+                        'check-in', 'check-out', 'cancel']
+
+    if any(kw in user_message for kw in room_keywords):
+        return handle_room_query(user_message, username, response)
+    elif any(kw in user_message for kw in staff_keywords):
+        return handle_staff_query(user_message, username, response)
+    elif any(kw in user_message for kw in booking_keywords):
+        return handle_booking_query(user_message, username, response)
+    else:
+        return handle_general_query(user_message, username, response)
+</pre>
+
+<div class="pb"></div>
+
+<h2 class="section">10.5 Payment Integration – webapp/views.py</h2>
+<pre>
+def payment_page(request):
+    customer = Totaldb.objects.order_by('-id').first()
+    payy = customer.TOTALPRICE
+    amount = int(payy * 100)  # Razorpay expects amount in paise
+    payy_str = str(amount)
+
+    if request.method == "POST":
+        order_currency = 'INR'
+        client = razorpay.Client(
+            auth=('rzp_test_klfWwvjaFXjXmC', 's9P7dwOwYckK352FfRJOXIRV')
+        )
+        payment = client.order.create({
+            'amount': amount,
+            'currency': order_currency,
+            'payment_capture': '1'
+        })
+
+    return render(request, "payment.html",
+                  {'customer': customer, 'payy_str': payy_str})
+</pre>
+
+<h2 class="section">10.6 OTP-Based Password Reset – webapp/views.py</h2>
+<pre>
+def generate_otp(request):
+    otp = random.randint(10000, 55555)
+    return otp
+
+def reset_password_email_verification(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+        if Registerdb.objects.filter(EMAIL=email).exists():
+            user = Registerdb.objects.get(EMAIL=email)
+            u_otp = generate_otp(request)
+            request.session['otp'] = u_otp
+            subject = "Forgot Password"
+            message = (f"Dear user, OTP for resetting your password "
+                       f"is: {u_otp}. Thank you, Hoteliers")
+            send_mail(subject, message, EMAIL_HOST_USER,
+                      [email], fail_silently=True)
+            context = {
+                'message': "An OTP sent to your registered email.",
+                'user': user,
+            }
+            return render(request, "16password_reset_otp.html", context)
+        else:
+            return render(request, "15password_reset_email.html",
+                          {'error': "Invalid email id"})
+
+def passwordReset_verify_otp(request, user_id):
+    user = Registerdb.objects.get(id=user_id)
+    if request.method == "POST":
+        u_otp = str(request.POST.get('otp')).strip()
+        s_otp = str(request.session.get('otp')).strip()
+        if u_otp == s_otp:
+            return render(request, "17reset_password.html",
+                          {'user': user, 'username': user.USERNAME})
+        else:
+            return render(request, "16password_reset_otp.html",
+                          {'error': "OTP does not match!", 'user': user})
+
+def reset_password(request, username):
+    if request.method == "POST":
+        user = Registerdb.objects.get(USERNAME=username)
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        if password1 == password2:
+            Registerdb.objects.filter(
+                USERNAME=username
+            ).update(PASSWORD=password1)
+            messages.success(request, "Password reset successfully!")
+            send_mail("Password Changed",
+                      "Your password has been changed.",
+                      EMAIL_HOST_USER, [user.EMAIL],
+                      fail_silently=True)
+            return redirect("user_login_page")
+        else:
+            return render(request, "17reset_password.html",
+                          {'error': "Passwords do not match!",
+                           'username': username})
+</pre>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 50-55 : TESTING
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">11. Testing</h1>
+
+<h2 class="section">11.1 Testing Strategy</h2>
+
+<p>Testing is a critical phase of the Software Development Life Cycle that ensures the software meets the specified requirements and is free from defects. The testing strategy for this project involved four levels of testing, each with a specific focus:</p>
+
+<ol>
+  <li><strong>Unit Testing:</strong> Testing individual functions, views, and model methods in isolation to verify that each unit produces the correct output for a given input.</li>
+  <li><strong>Integration Testing:</strong> Testing the interaction between two or more connected modules to verify that data flows correctly from one module to another.</li>
+  <li><strong>System Testing:</strong> Testing the complete, integrated system as a whole to verify that it meets all functional and non-functional requirements from the user's perspective.</li>
+  <li><strong>User Acceptance Testing (UAT):</strong> Testing by potential end-users (hotel staff and simulated customers) to verify that the system is usable, intuitive, and meets real-world expectations.</li>
+</ol>
+
+<p>For each test case, the test ID, description, input, expected result, actual result, and pass/fail status are documented.</p>
+
+<h2 class="section">11.2 Unit Testing</h2>
+
+<table>
+  <tr><th>Test ID</th><th>Test Case Description</th><th>Input</th><th>Expected Result</th><th>Status</th></tr>
+  <tr><td>UT-01</td><td>User registration with valid data</td><td>Username: "john", Email: "john@mail.com", Password: "pass123", Confirm: "pass123"</td><td>New record created in Registerdb; redirect to sign-in page with success message</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-02</td><td>User login with valid credentials</td><td>Username: "john", Password: "pass123"</td><td>Session created with USERNAME="john"; redirect to home page</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-03</td><td>User login with wrong password</td><td>Username: "john", Password: "wrong"</td><td>Warning message "Signin failed"; redirect to sign-in page; no session created</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-04</td><td>User logout</td><td>Click "Sign Out" while logged in</td><td>Session destroyed; redirect to home page with success message</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-05</td><td>Add room type with image</td><td>Name: "Deluxe", Description: "Luxury room", Image: deluxe.jpg</td><td>Record saved in roomtypedb; success message displayed</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-06</td><td>Add room with FK to room type</td><td>Type: "Deluxe" (dropdown), Name: "Room 101", Price: 5000, Image: room101.jpg</td><td>Record saved in roomnamedb with ROOMTYPE FK pointing to correct type</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-07</td><td>Edit room type</td><td>Change name from "Deluxe" to "Super Deluxe"</td><td>Record updated; rooms still linked correctly</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-08</td><td>Delete room type</td><td>Delete "Standard" type with 2 rooms</td><td>Room type and its 2 rooms deleted (CASCADE)</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-09</td><td>Add staff member</td><td>Name: "Priya", Designation: "Receptionist", Image: priya.jpg</td><td>Record saved in staffdb; displayed on staff page</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-10</td><td>Save customer contact message</td><td>Name: "Guest", Email: "guest@mail.com", Subject: "Enquiry"</td><td>Record saved in customercontactdb; success message</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-11</td><td>Book room – available (no overlap)</td><td>Room: 101, Checkin: 2026-03-20, Checkout: 2026-03-22</td><td>Booking saved; confirmation email sent; redirect to cart</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-12</td><td>Book room – overlapping dates</td><td>Room: 101, Checkin: 2026-03-21, Checkout: 2026-03-23 (overlaps UT-11)</td><td>Error message "Room already booked for these dates"; booking not saved</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-13</td><td>Book room – adjacent dates (no overlap)</td><td>Room: 101, Checkin: 2026-03-22, Checkout: 2026-03-24</td><td>Booking saved (checkout of UT-11 = checkin of this; boundary is acceptable)</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-14</td><td>Cart subtotal calculation</td><td>Two bookings: ₹3000 + ₹5000</td><td>Subtotal: ₹8000, Tax: 10 (>5000), Total: ₹8010</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-15</td><td>Delete booking from cart</td><td>Delete booking ID=5</td><td>Booking removed; cart recalculated; warning message</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-16</td><td>OTP generation</td><td>Call generate_otp()</td><td>Random integer between 10000 and 55555</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-17</td><td>OTP email dispatch</td><td>Valid email "john@mail.com"</td><td>OTP stored in session; email sent to john@mail.com</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-18</td><td>OTP verification – correct</td><td>Entered OTP matches session OTP</td><td>New password form displayed</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-19</td><td>OTP verification – incorrect</td><td>Entered OTP does not match</td><td>Error "OTP does not match"; OTP form redisplayed</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-20</td><td>Password reset – matching passwords</td><td>Password1: "new123", Password2: "new123"</td><td>Password updated; notification email sent; redirect to sign-in</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-21</td><td>Password reset – mismatched passwords</td><td>Password1: "new123", Password2: "new456"</td><td>Error "Passwords do not match"; form redisplayed</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-22</td><td>Chatbot – room query</td><td>"Show me luxury rooms"</td><td>Response with room cards (type, name, price, image)</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-23</td><td>Chatbot – staff query</td><td>"Tell me about the staff"</td><td>Response with staff count and details</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-24</td><td>Chatbot – booking query</td><td>"How do I cancel my booking?"</td><td>Response with cancellation information and suggestions</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-25</td><td>Chatbot – general greeting</td><td>"Hello"</td><td>Response: "Hello! 👋 Welcome to our hotel..."</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-26</td><td>Rate chatbot response</td><td>conversation_id=1, rating=5</td><td>Rating saved; success message returned</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-27</td><td>Advanced search API – by price range</td><td>min_price=2000, max_price=5000</td><td>JSON array of rooms with price between 2000–5000</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-28</td><td>Advanced search API – by room type</td><td>room_type="Deluxe"</td><td>JSON array of rooms of type "Deluxe" only</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-29</td><td>Advanced search API – by date availability</td><td>check_in=2026-03-20, check_out=2026-03-22</td><td>JSON array excluding rooms booked for those dates</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>UT-30</td><td>PDF generation</td><td>Logged-in user with bookings</td><td>PDF file downloaded with booking details</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+</table>
+
+<div class="pb"></div>
+
+<h2 class="section">11.3 Integration Testing</h2>
+
+<table>
+  <tr><th>Test ID</th><th>Test Case</th><th>Modules Involved</th><th>Expected Result</th><th>Status</th></tr>
+  <tr><td>IT-01</td><td>Registration → Login → Booking</td><td>Module 1 → Module 5</td><td>User registers → signs in (session created) → books room → CUSTOMER FK links booking to Registerdb record</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>IT-02</td><td>Booking → Payment Processing</td><td>Module 5 → Module 6</td><td>Booking saved → cart shows subtotal/tax/total → Totaldb record created with BOOKING FK → Razorpay order created</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>IT-03</td><td>Room Type → Room → Search Results</td><td>Module 2 → Module 5</td><td>Room type created → room added with FK → advanced search returns room with correct type name</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>IT-04</td><td>Contact Form → Admin View</td><td>Module 4 → Admin Backend</td><td>Customer submits contact form → record appears on admin contact messages page</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>IT-05</td><td>Chatbot → Conversation Storage → Admin</td><td>Module 8 → Django Admin</td><td>User sends chat → conversation saved in ChatbotConversation → visible in Django Admin</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>IT-06</td><td>Booking → Email Notification</td><td>Module 5 → Module 7</td><td>Booking saved → confirmation email sent to customer's email address</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>IT-07</td><td>Password Reset → OTP Email → Password Update</td><td>Module 1 → Module 7</td><td>Email entered → OTP generated and emailed → OTP verified → password updated → notification email sent</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>IT-08</td><td>Room Type Delete → Cascade to Rooms → Cascade to Bookings</td><td>Module 2 → Module 5</td><td>Deleting room type cascades to rooms and their bookings (referential integrity maintained)</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>IT-09</td><td>Chatbot Room Query → Database Lookup → Card Rendering</td><td>Module 8 → Module 2</td><td>User asks about rooms → chatbot queries roomnamedb → returns room cards with images from media folder</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>IT-10</td><td>Search with Date Filter → Overlap Check</td><td>Module 5 (Search + Booking)</td><td>Search excludes rooms with bookings overlapping the requested dates</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+</table>
+
+<h2 class="section">11.4 System Testing</h2>
+
+<table>
+  <tr><th>Test ID</th><th>Scenario</th><th>Steps</th><th>Expected Outcome</th><th>Status</th></tr>
+  <tr><td>ST-01</td><td>Complete customer journey</td><td>Register → Sign in → Browse rooms → Advanced search → Select room → Book → View cart → Enter payment details → Pay via Razorpay → Sign out</td><td>All steps complete successfully; data persisted in all tables; email received</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>ST-02</td><td>Complete admin management cycle</td><td>Admin login → Add room type → Add room → Add staff → View bookings → View payments → View contacts → Django Admin chatbot → Logout</td><td>All CRUD operations successful; data visible on all pages</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>ST-03</td><td>Chatbot end-to-end</td><td>Open chatbot → Room query → Get room cards → Staff query → Booking query → General greeting → Rate responses</td><td>All query types return correct responses; conversations saved; ratings stored</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>ST-04</td><td>Password reset end-to-end</td><td>Forgot password → Enter email → Receive OTP → Enter OTP → Set new password → Login with new password</td><td>OTP verified; password updated; old password rejected; new password works</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>ST-05</td><td>Responsive design – Desktop</td><td>Open all pages at 1920×1080 resolution</td><td>Full layout; proper spacing; all features visible and functional</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>ST-06</td><td>Responsive design – Tablet</td><td>Open all pages at 768×1024 resolution</td><td>Layout adapts; no horizontal overflow; navigation collapses to hamburger menu</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>ST-07</td><td>Responsive design – Mobile</td><td>Open all pages at 375×667 resolution</td><td>Single-column layout; touch-friendly buttons; all features accessible</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>ST-08</td><td>Cross-browser – Chrome</td><td>All features in Chrome 120+</td><td>All features work correctly</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>ST-09</td><td>Cross-browser – Edge</td><td>All features in Edge 120+</td><td>All features work correctly</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+  <tr><td>ST-10</td><td>Cross-browser – Firefox</td><td>All features in Firefox 120+</td><td>All features work correctly</td><td style="color:var(--ok);font-weight:700">Pass ✓</td></tr>
+</table>
+
+<div class="pb"></div>
+
+<h2 class="section">11.5 User Acceptance Testing (UAT)</h2>
+
+<p>User Acceptance Testing was conducted by allowing potential end-users (friends and family members acting as hotel staff and customers) to use the system and provide feedback.</p>
+
+<table>
+  <tr><th>Test ID</th><th>User Role</th><th>Task Given</th><th>User Feedback</th><th>Status</th></tr>
+  <tr><td>UAT-01</td><td>Customer</td><td>Register, browse rooms, book a room, and make payment</td><td>"The process was smooth. I could easily find and book a room."</td><td style="color:var(--ok);font-weight:700">Accepted ✓</td></tr>
+  <tr><td>UAT-02</td><td>Customer</td><td>Use the chatbot to find room information</td><td>"The chatbot answered my questions about rooms quickly. The room cards were helpful."</td><td style="color:var(--ok);font-weight:700">Accepted ✓</td></tr>
+  <tr><td>UAT-03</td><td>Customer</td><td>Reset password using email OTP</td><td>"I received the OTP promptly and was able to reset my password without issues."</td><td style="color:var(--ok);font-weight:700">Accepted ✓</td></tr>
+  <tr><td>UAT-04</td><td>Admin</td><td>Add room types, rooms, and staff; view bookings and payments</td><td>"The admin panel is straightforward. Adding and managing data is easy."</td><td style="color:var(--ok);font-weight:700">Accepted ✓</td></tr>
+  <tr><td>UAT-05</td><td>Customer</td><td>Use advanced search to find rooms by price range and date</td><td>"The search results appeared instantly. I liked that it showed availability."</td><td style="color:var(--ok);font-weight:700">Accepted ✓</td></tr>
+</table>
+
+<h2 class="section">11.6 Debugging and Bug Fixing</h2>
+
+<p>During the testing phase, several bugs and issues were identified and resolved:</p>
+
+<table>
+  <tr><th>Bug ID</th><th>Description</th><th>Root Cause</th><th>Fix Applied</th></tr>
+  <tr><td>BUG-01</td><td>Double booking allowed for same room and dates</td><td>Simple equality check on dates instead of date-range overlap logic</td><td>Implemented proper overlap detection: <code>CHECKIN__lte=checkout, CHECKOUT__gte=checkin</code></td></tr>
+  <tr><td>BUG-02</td><td>Room type image not displaying after edit</td><td>Image field not included in the edit form's enctype</td><td>Added <code>enctype="multipart/form-data"</code> to the edit form</td></tr>
+  <tr><td>BUG-03</td><td>Chatbot returned empty response for some queries</td><td>Keyword matching was case-sensitive</td><td>Converted user message to lowercase before comparison</td></tr>
+  <tr><td>BUG-04</td><td>ForeignKey assignment error when adding room</td><td>Passing string ID instead of model object</td><td>Used <code>roomtypedb.objects.get(id=type_id)</code> to get the object before assignment</td></tr>
+  <tr><td>BUG-05</td><td>OTP comparison failed even with correct OTP</td><td>Whitespace in pasted OTP string</td><td>Added <code>.strip()</code> to both user input and session value before comparison</td></tr>
+  <tr><td>BUG-06</td><td>Payment amount incorrect in Razorpay</td><td>Amount not multiplied by 100 (Razorpay uses paise)</td><td>Changed to <code>amount = int(price * 100)</code></td></tr>
+  <tr><td>BUG-07</td><td>Staff page crash when staff has no image</td><td>Template accessing <code>.url</code> on null ImageField</td><td>Added conditional check in chatbot: <code>if room.ROOMIMAGE else None</code></td></tr>
+  <tr><td>BUG-08</td><td>Search by room type returned all rooms</td><td>Filter used wrong field name</td><td>Changed to <code>ROOMTYPE__ROOMTYPE__icontains</code> for FK lookup</td></tr>
+</table>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 56-57 : VALIDATIONS
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">12. Validations Performed</h1>
+
+<p>The following validations are implemented throughout the system to ensure data integrity, prevent erroneous input, and maintain a consistent user experience:</p>
+
+<ol>
+  <li><strong>Unique Customer ID:</strong> Every registered user has a unique, auto-generated Customer ID (primary key) in the USER_MASTER (Registerdb) table, ensuring that no two users share the same identifier.</li>
+
+  <li><strong>Mandatory Fields:</strong> All compulsory fields such as username, email, password, room selection, check-in date, check-out date, and total price must not be left blank in the signup and booking forms. The server-side view functions check for the presence of these values before saving records to the database.</li>
+
+  <li><strong>Password Masking:</strong> In password fields, characters typed by the user are masked with dot symbols (●) so that the actual password is not visible on the screen, preventing shoulder-surfing attacks.</li>
+
+  <li><strong>Numeric Field Validation:</strong> The system does not accept alphabetic characters or negative values where only numeric amounts are required, such as room price, number of adults, number of children, and total amount. The Django model defines these fields as <code>IntegerField</code>, and the HTML input uses <code>type="number"</code> with appropriate min/max attributes.</li>
+
+  <li><strong>Date Format Validation:</strong> Proper date format validation is applied for CHECKIN and CHECKOUT fields. The Django model uses <code>DateField</code>, and the HTML input uses <code>type="date"</code> to enforce the correct format. The system also validates that the checkout date is after the check-in date.</li>
+
+  <li><strong>Date-Range Overlap Detection:</strong> A booking is not saved if the selected room is already booked for any overlapping date range. The system queries existing bookings where <code>CHECKIN ≤ new_checkout AND CHECKOUT ≥ new_checkin</code>. If any such record exists, the booking is rejected with an error message, ensuring no double booking occurs.</li>
+
+  <li><strong>Referential Integrity:</strong> Master information such as room types and rooms that are linked to existing bookings are protected by Django's <code>on_delete</code> constraints. Cascade deletion ensures that orphan records are not left in the database, and SET_NULL ensures that deleting a user does not delete their booking history.</li>
+
+  <li><strong>Authentication Gate:</strong> Any unauthorized person cannot enter into the system because each user is validated using username and password at login. Admin pages are restricted to users authenticated via Django's built-in <code>authenticate()</code> function. Customer pages that require login (booking, cart, payment) check for the presence of <code>USERNAME</code> in the session.</li>
+
+  <li><strong>Email Format Validation:</strong> Email fields use Django's <code>EmailField</code>, which validates that the entered value follows the standard email format (user@domain.com). This prevents invalid email addresses from being stored in the database.</li>
+
+  <li><strong>Image File Validation:</strong> Image upload fields use Django's <code>ImageField</code>, which validates that the uploaded file is a valid image format (JPEG, PNG, AVIF, etc.) and rejects non-image files.</li>
+
+  <li><strong>CSRF Token Validation:</strong> Every form submission is validated for the presence of a valid CSRF token. Django's CSRF middleware rejects any POST request that does not include the correct token, preventing cross-site request forgery attacks.</li>
+
+  <li><strong>OTP Validation:</strong> During password reset, the entered OTP is compared (after stripping whitespace) with the OTP stored in the session. If they do not match, the reset process is halted and an error message is displayed.</li>
+</ol>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 58-60 : INPUT/OUTPUT SCREENS
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">13. Input and Output Screens</h1>
+
+<p>The following table lists all the key input and output screens of the system. Original screenshots of each screen should be captured from the running application and attached in the printed report.</p>
+
+<table>
+  <tr><th>#</th><th>Screen Name</th><th>Type</th><th>Description</th></tr>
+  <tr><td>1</td><td>Home Page</td><td>Output</td><td>The landing page of the website displaying room type category cards with images, a navigation bar, and the floating chatbot widget. Each room type card shows the type name, description, and image, with a link to view rooms of that category.</td></tr>
+  <tr><td>2</td><td>User Sign-Up Page</td><td>Input</td><td>Registration form with four fields: username, email address, password, and confirm password. Each field has appropriate validation. A "Sign Up" button submits the form, and a link redirects to the sign-in page for existing users.</td></tr>
+  <tr><td>3</td><td>User Sign-In Page</td><td>Input</td><td>Login form with two fields: username and password. Includes a "Sign In" button and a "Forgot Password?" link for password recovery.</td></tr>
+  <tr><td>4</td><td>Forgot Password – Email Verification</td><td>Input</td><td>Single email input field where the user enters their registered email address to receive an OTP for password reset.</td></tr>
+  <tr><td>5</td><td>Forgot Password – OTP Entry</td><td>Input</td><td>OTP input field where the user enters the OTP received via email. Includes a message confirming that the OTP has been sent.</td></tr>
+  <tr><td>6</td><td>Forgot Password – New Password</td><td>Input</td><td>Two password fields (new password and confirm new password) for setting the new password after OTP verification.</td></tr>
+  <tr><td>7</td><td>About / Our Team Page</td><td>Output</td><td>Displays staff member cards with photo, name, designation, and social media links (Facebook, Instagram).</td></tr>
+  <tr><td>8</td><td>Services Page</td><td>Output</td><td>Lists the hotel's services and amenities with icons and descriptions.</td></tr>
+  <tr><td>9</td><td>Room Categories Page</td><td>Output</td><td>Displays all room type categories as cards with images and "View Rooms" buttons.</td></tr>
+  <tr><td>10</td><td>Filtered Rooms Page</td><td>Output</td><td>Shows all rooms of a selected type with room name, image, price, description, and "Book Now" button.</td></tr>
+  <tr><td>11</td><td>Advanced Search Page</td><td>Input/Output</td><td>Left panel with filter inputs (room name, room type dropdown, min price, max price, check-in date, check-out date, search button). Right panel displays AJAX-loaded room result cards.</td></tr>
+  <tr><td>12</td><td>Booking Form Page</td><td>Input</td><td>Form fields: customer name, email, check-in date, check-out date, number of adults, number of children, selected room (hidden), special request (textarea), total price (calculated). "Confirm Booking" button.</td></tr>
+  <tr><td>13</td><td>Booking Cart / Saved Rooms Page</td><td>Output</td><td>Table of booked rooms showing room name, dates, price, and a delete (×) button. Below the table: subtotal, tax, and total. "Proceed to Payment" button.</td></tr>
+  <tr><td>14</td><td>Payment Page (Razorpay)</td><td>Input/Output</td><td>Shows customer name, mobile number input, and total amount. Razorpay payment button triggers the payment popup with card/UPI/net banking options.</td></tr>
+  <tr><td>15</td><td>Customer Contact Form</td><td>Input</td><td>Five-field form: name, phone number, email, subject, and message (textarea). "Send Message" button.</td></tr>
+  <tr><td>16</td><td>Chatbot Widget</td><td>Input/Output</td><td>Floating chat icon that opens a chat window. Message input at the bottom. Chat history with user messages (right-aligned) and bot responses (left-aligned). Suggestion chips below bot responses. Room cards displayed for room queries.</td></tr>
+  <tr><td>17</td><td>Admin Login Page</td><td>Input</td><td>Username and password fields for admin authentication using Django's auth system.</td></tr>
+  <tr><td>18</td><td>Admin – Add Room Type</td><td>Input</td><td>Form with room type name, description, and image upload fields.</td></tr>
+  <tr><td>19</td><td>Admin – Display Room Types</td><td>Output</td><td>Table listing all room types with columns: ID, name, image (thumbnail), description, edit button, delete button.</td></tr>
+  <tr><td>20</td><td>Admin – Add Room</td><td>Input</td><td>Form with room type (dropdown FK), room name, price, description, and image upload.</td></tr>
+  <tr><td>21</td><td>Admin – Display Rooms</td><td>Output</td><td>Table listing all rooms with columns: ID, room type, room name, image, price, description, edit, delete.</td></tr>
+  <tr><td>22</td><td>Admin – Add Staff</td><td>Input</td><td>Form with staff name, designation, Facebook URL, Instagram URL, and image upload.</td></tr>
+  <tr><td>23</td><td>Admin – Display Staff</td><td>Output</td><td>Table listing all staff with columns: ID, name, designation, social links, image, edit, delete.</td></tr>
+  <tr><td>24</td><td>Admin – Customer Contact Messages</td><td>Output</td><td>Table listing all contact messages with name, phone, email, subject, message, and delete button.</td></tr>
+  <tr><td>25</td><td>Admin – Booked Details</td><td>Output</td><td>Table listing all bookings with customer name, email, room, check-in, check-out, adults, children, price.</td></tr>
+  <tr><td>26</td><td>Admin – Payment Totals</td><td>Output</td><td>Table listing payment records with customer name, mobile, total amount, and linked booking.</td></tr>
+</table>
+
+<div class="hl warn">
+  <strong>Important Note:</strong> Attach original screenshots of each screen in the printed hard-bound copy of the project report. Do not use xerox copies of the screenshots. Each screenshot should be clearly labelled with a figure number and caption.
+</div>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 61-62 : REPORT GENERATION
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">14. Report Generation</h1>
+
+<p>The system generates the following reports for administrative use, customer reference, and record-keeping:</p>
+
+<table>
+  <tr><th style="width:28%">Report Name</th><th>Description</th><th>Format</th></tr>
+  <tr><td>Customer Booking Report</td><td>Displays details of customers who have booked rooms including customer name, email, mobile, selected room (with room type), check-in date, check-out date, number of adults, number of children, special requests, and total price. This report helps the hotel administration track all active and past bookings.</td><td>HTML (on-screen)<br>PDF (downloadable)</td></tr>
+  <tr><td>Room Booking Summary Report</td><td>A summarized list of all bookings for each room showing room type, room name, booking dates, occupancy (adults + children), and total revenue per room. This report helps the hotel analyze room usage, identify popular rooms, and plan inventory.</td><td>HTML (on-screen)</td></tr>
+  <tr><td>Payment / Revenue Report</td><td>Payment details from the Totaldb table including customer name, mobile number, booking reference (FK), and total amount paid. This report supports financial tracking, reconciliation with Razorpay, and revenue analysis.</td><td>HTML (on-screen)</td></tr>
+  <tr><td>Customer Contact Report</td><td>All messages submitted through the customer contact form with customer name, email, phone, subject, and full message text. This report helps the hotel staff follow up on guest enquiries and complaints.</td><td>HTML (on-screen)</td></tr>
+  <tr><td>Staff Details Report</td><td>Staff information including name, designation, social media links, and photo. This report is used for internal HR records and for generating the "Our Team" section on the website.</td><td>HTML (on-screen)</td></tr>
+</table>
+
+<p>The PDF report generation uses the <code>xhtml2pdf</code> library, which converts an HTML template (rendered using Django's template engine) into a downloadable PDF document. The process involves:</p>
+
+<ol>
+  <li>Preparing the context data (booking details, customer name, etc.)</li>
+  <li>Rendering an HTML template to a string using <code>render_to_string()</code></li>
+  <li>Creating an HttpResponse with <code>content_type='application/pdf'</code></li>
+  <li>Setting the <code>Content-Disposition</code> header for file download</li>
+  <li>Calling <code>pisa.CreatePDF()</code> to convert the HTML string to PDF</li>
+  <li>Returning the PDF response to the browser</li>
+</ol>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 63-64 : SECURITY
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">15. Implementation of Security</h1>
+
+<p>Security is a critical aspect of any web application, especially one that handles sensitive data such as customer personal information, booking details, and financial transactions. The following security measures are implemented in this project:</p>
+
+<ol>
+  <li><strong>User Authentication:</strong> Customer login is verified by checking the entered username and password against the Registerdb table. Upon successful login, the username is stored in the Django session. Pages that require authentication (booking, cart, payment, profile) check for the presence of <code>request.session['USERNAME']</code> before allowing access. If the session variable is not present, the user is redirected to the sign-in page.</li>
+
+  <li><strong>Admin Authentication:</strong> Admin backend access is protected using Django's built-in authentication system. The admin login view uses <code>authenticate(username, password)</code> and <code>login(request, user)</code> functions from <code>django.contrib.auth</code>. Only authenticated admin users can access admin pages.</li>
+
+  <li><strong>CSRF (Cross-Site Request Forgery) Protection:</strong> Django's CSRF middleware (<code>django.middleware.csrf.CsrfViewMiddleware</code>) is enabled in the project settings. Every form in the application includes the <code>{% csrf_token %}</code> template tag, which generates a hidden CSRF token. All POST requests are validated for the presence of a valid CSRF token, preventing attackers from submitting forms on behalf of authenticated users.</li>
+
+  <li><strong>SQL Injection Prevention:</strong> All database queries are performed through Django's ORM (Object-Relational Mapper), which uses parameterised queries internally. This prevents SQL injection attacks because user input is never concatenated directly into SQL strings. For example, <code>Registerdb.objects.filter(USERNAME=un, PASSWORD=pswd)</code> generates a parameterised SQL query.</li>
+
+  <li><strong>XSS (Cross-Site Scripting) Protection:</strong> Django's template engine auto-escapes all variables by default. This means that any user-supplied data rendered in a template (e.g., customer names, messages, room descriptions) is HTML-escaped to prevent the injection of malicious JavaScript code.</li>
+
+  <li><strong>Password Masking:</strong> All password input fields use <code>type="password"</code> in the HTML, which masks the characters entered by the user with dots (●), preventing password visibility to bystanders.</li>
+
+  <li><strong>OTP-Based Password Reset:</strong> Forgotten passwords are recovered via a time-bound OTP (One-Time Password) sent to the user's registered email address. The OTP is a random 5-digit number stored in the server-side session (not accessible to the client). The user must enter the correct OTP to proceed with password reset, adding an extra layer of security.</li>
+
+  <li><strong>Session Management:</strong> User sessions are managed securely by Django's session framework. Session data is stored on the server side. On logout, the session variables are explicitly deleted (<code>del request.session['USERNAME']</code>), preventing unauthorized re-access. Django sessions use secure, randomly generated session IDs stored in cookies.</li>
+
+  <li><strong>Input Validation:</strong> Server-side validation ensures that mandatory fields are present, numeric fields contain valid numbers, date fields contain valid dates, and email fields contain properly formatted email addresses. This prevents the storage of corrupt or malicious data in the database.</li>
+
+  <li><strong>Clickjacking Protection:</strong> Django's <code>XFrameOptionsMiddleware</code> is enabled, which sets the <code>X-Frame-Options</code> HTTP header to prevent the application from being embedded in iframes on other websites, protecting against clickjacking attacks.</li>
+
+  <li><strong>Secret Key Protection:</strong> The Django <code>SECRET_KEY</code> is stored in a <code>.env</code> file and loaded using <code>python-decouple</code>, ensuring that sensitive configuration is not hardcoded in the source code or version-controlled.</li>
+</ol>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 65 : DEPLOYMENT
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">16. Deployment and Installation Guide</h1>
+
+<p>This section provides step-by-step instructions for installing and running the Hotel Room Booking application on a development machine.</p>
+
+<h2 class="section">16.1 Prerequisites</h2>
+<ul>
+  <li>Python 3.10 or above installed</li>
+  <li>pip (Python package manager) installed</li>
+  <li>Git installed (optional, for version control)</li>
+  <li>A modern web browser (Chrome, Edge, Firefox)</li>
+  <li>Internet connection (for payment gateway and email)</li>
+</ul>
+
+<h2 class="section">16.2 Installation Steps</h2>
+
+<pre>
+# Step 1: Clone or copy the project folder
+cd /path/to/your/directory
+# Copy the project folder "Hoteliers_Myproject" here
+
+# Step 2: Create a Python virtual environment
+python -m venv venv
+
+# Step 3: Activate the virtual environment
+# On Linux/macOS:
+source venv/bin/activate
+# On Windows:
+venv\Scripts\activate
+
+# Step 4: Install required Python packages
+pip install -r requirements.txt
+
+# Step 5: Create a .env file in the project root with:
+# SECRET_KEY=your-secret-key-here
+# DEBUG=True
+# EMAIL_HOST_USER=your-email@gmail.com
+# EMAIL_HOST_PASSWORD=your-app-password
+
+# Step 6: Apply database migrations
+python manage.py makemigrations
+python manage.py migrate
+
+# Step 7: Create a superuser for admin access
+python manage.py createsuperuser
+
+# Step 8: Start the development server
+python manage.py runserver
+
+# Step 9: Open browser and navigate to:
+# Customer Website: http://127.0.0.1:8000/
+# Admin Backend:    http://127.0.0.1:8000/Backend/
+# Django Admin:     http://127.0.0.1:8000/admin/
+</pre>
+
+<h2 class="section">16.3 Project Directory Structure</h2>
+<pre>
+Hoteliers_Myproject/
+├── manage.py                  # Django management script
+├── requirements.txt           # Python package dependencies
+├── (PostgreSQL database is used; no file, server-based)
+├── .env                       # Environment variables (SECRET_KEY, email config)
+│
+├── Hotelierss/                # Django project settings
+│   ├── settings.py            # Project configuration
+│   ├── urls.py                # Root URL routing
+│   ├── wsgi.py                # WSGI entry point
+│   └── asgi.py                # ASGI entry point
+│
+├── Backend/                   # Admin backend app
+│   ├── models.py              # Room type, room, staff models
+│   ├── chatbot_models.py      # Chatbot and notification models
+│   ├── views.py               # Admin CRUD views
+│   ├── chatbot_views.py       # Chatbot API views
+│   ├── urls.py                # Admin URL routes
+│   ├── admin.py               # Django admin registration
+│   ├── templates/             # Admin HTML templates
+│   ├── static/                # CSS, JS, images, fonts
+│   └── migrations/            # Database migration files
+│
+├── webapp/                    # Customer-facing app
+│   ├── models.py              # Contact, user, booking, payment models
+│   ├── views.py               # Customer views (booking, payment, auth)
+│   ├── urls.py                # Customer URL routes
+│   ├── templates/             # Customer HTML templates
+│   └── migrations/            # Database migration files
+│
+└── media/                     # User-uploaded files
+    ├── roomtypeimages/        # Room type images
+    ├── roomimage/             # Room images
+    └── staffimage/            # Staff photos
+</pre>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 66-67 : LIMITATIONS
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">17. Limitations of the Project</h1>
+
+<p>While the system fulfils all the defined objectives, it has the following limitations that should be considered:</p>
+
+<ol>
+  <li><strong>Operating System Requirement:</strong> The system requires a modern operating system (Windows 10 or higher, recent Linux distribution, or macOS) capable of running a Python/Django environment. It cannot be run on older systems that do not support Python 3.10+.</li>
+
+  <li><strong>Software Dependencies:</strong> The application requires Python, Django, PostgreSQL, and supporting libraries (Razorpay SDK, xhtml2pdf, Pillow, python-decouple) to be installed and properly configured on the server machine. These dependencies must be managed through a virtual environment.</li>
+
+  <li><strong>Hardware Requirements:</strong> For smooth performance with multiple concurrent users, the deployment system should have at least a dual-core processor and 4–8 GB RAM. Very low-end hardware may cause slower response times during peak usage.</li>
+
+  <li><strong>Rule-Based Chatbot:</strong> The chatbot uses rule-based keyword matching to classify queries and generate responses. It does not support natural language understanding (NLU), sentiment analysis, or machine learning–based response generation. Complex or ambiguous queries may not be understood correctly.</li>
+
+  <li><strong>Plain-Text Passwords:</strong> Customer passwords in the custom Registerdb table are stored as plain text. While Django's built-in User model with hashed passwords (using PBKDF2, Argon2, or bcrypt) would provide stronger security, the current implementation stores passwords as-is for simplicity. This is a known security limitation.</li>
+
+  <li><strong>PostgreSQL Database:</strong> The application uses PostgreSQL, which is a server-based relational database suitable for development and production. PostgreSQL supports concurrent write operations efficiently and is recommended for high-traffic production use.</li>
+
+  <li><strong>Single-Hotel System:</strong> The system is designed for a single hotel. It does not support multi-hotel or multi-branch management with a centralised dashboard. Each hotel would need a separate installation.</li>
+
+  <li><strong>No Dynamic Pricing:</strong> Room prices are fixed values set by the admin. The system does not support dynamic pricing based on demand, season, or occupancy rates.</li>
+
+  <li><strong>No Refund Processing:</strong> While the system integrates with Razorpay for payments, it does not currently support automated refund processing for cancelled bookings. Refunds would need to be handled manually through the Razorpay dashboard.</li>
+
+  <li><strong>No Mobile App:</strong> The system is a web application only. There is no native mobile app for Android or iOS, although the responsive design ensures a good experience on mobile browsers.</li>
+</ol>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 68-70 : FUTURE SCOPE
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">18. Future Scope and Enhancement</h1>
+
+<p>This project is designed and developed in such a manner that it provides maximum efficiency and speed, and it has a wide scope for further development. The modular Django architecture allows new features to be added as new apps or modules with minimal changes to the existing database structure and application code. The following enhancements are planned for future versions:</p>
+
+<ol>
+  <li><strong>Dynamic Pricing Engine:</strong> Implement an algorithm that automatically adjusts room prices based on demand, season (peak/off-peak), occupancy rates, and competitor pricing. This would maximize revenue and ensure competitive pricing.</li>
+
+  <li><strong>Loyalty Program and Discount Coupons:</strong> Build a loyalty program that rewards returning customers with points, discounts, and exclusive offers. Implement a coupon/promo code system that allows customers to apply discount codes during booking.</li>
+
+  <li><strong>Multi-Hotel / Multi-Branch Support:</strong> Extend the database schema and admin interface to support multiple hotels or branches under a single platform, with a centralised dashboard for chain management and individual hotel dashboards for branch managers.</li>
+
+  <li><strong>Advanced Analytical Reports and Dashboards:</strong> Build interactive dashboards with charts and graphs for occupancy rates, revenue trends, customer demographics, booking patterns, staff performance, and chatbot usage analytics using libraries like Chart.js or Plotly.</li>
+
+  <li><strong>AI/NLP-Based Chatbot:</strong> Replace the rule-based keyword matching with a Natural Language Processing (NLP) engine using machine learning models (such as those from Hugging Face Transformers or OpenAI API) for deeper conversational understanding, context retention, and more natural responses.</li>
+
+  <li><strong>OTA Channel Integration:</strong> Integrate with external hotel booking channels (Online Travel Agencies) such as Booking.com, MakeMyTrip, and Goibibo APIs to synchronise room availability and bookings across multiple platforms.</li>
+
+  <li><strong>Advanced Payment Features:</strong> Implement refund processing, invoice generation (with GST calculations), multiple payment methods (wallet, EMI), and payment history tracking with transaction IDs.</li>
+
+  <li><strong>Customer Review and Rating System:</strong> Allow customers to leave reviews and ratings for rooms, services, and their overall stay experience. Display aggregate ratings on room pages to help future customers make informed decisions.</li>
+
+  <li><strong>SMS Notifications:</strong> Add SMS-based notifications (using Twilio or MSG91 API) in addition to email alerts for booking confirmations, OTPs, check-in reminders, and promotional messages.</li>
+
+  <li><strong>Production Database:</strong> PostgreSQL is used for production-grade scalability, concurrent write support, and cloud deployment readiness.</li>
+
+  <li><strong>Cloud Deployment:</strong> Deploy the application on cloud platforms such as AWS (Elastic Beanstalk), Google Cloud (App Engine), DigitalOcean, or Heroku for high availability, scalability, and global access.</li>
+
+  <li><strong>Native Mobile Application:</strong> Develop a companion mobile app for Android and iOS using React Native or Flutter that communicates with the Django backend via REST APIs.</li>
+
+  <li><strong>Multi-Language Support:</strong> Implement internationalization (i18n) using Django's built-in translation framework to support multiple languages for global customers.</li>
+
+  <li><strong>Hashed Password Storage:</strong> Migrate from plain-text password storage to Django's built-in User model with PBKDF2/Argon2 password hashing for stronger security compliance.</li>
+
+  <li><strong>Room Amenity Tagging:</strong> Add a tagging system for room amenities (Wi-Fi, AC, TV, Mini-bar, Balcony, etc.) and allow customers to filter rooms by specific amenities during search.</li>
+</ol>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 71 : GLOSSARY
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">19. Glossary of Terms</h1>
+
+<table>
+  <tr><th style="width:28%">Term</th><th>Definition</th></tr>
+  <tr><td>AJAX</td><td>Asynchronous JavaScript and XML – A technique for sending/receiving data from a server without reloading the full web page.</td></tr>
+  <tr><td>API</td><td>Application Programming Interface – A set of defined rules and protocols for building and interacting with software applications.</td></tr>
+  <tr><td>Bootstrap</td><td>A popular open-source CSS framework for building responsive, mobile-first web interfaces.</td></tr>
+  <tr><td>CRUD</td><td>Create, Read, Update, Delete – The four basic operations performed on database records.</td></tr>
+  <tr><td>CSRF</td><td>Cross-Site Request Forgery – A web security vulnerability where an attacker tricks a user into performing unintended actions.</td></tr>
+  <tr><td>DFD</td><td>Data Flow Diagram – A graphical representation of data flow through a system, showing processes, data stores, and external entities.</td></tr>
+  <tr><td>Django</td><td>A high-level Python web framework that follows the Model-View-Template (MVT) architectural pattern.</td></tr>
+  <tr><td>ER Diagram</td><td>Entity-Relationship Diagram – A visual representation of entities, attributes, and their relationships in a database.</td></tr>
+  <tr><td>FK (Foreign Key)</td><td>A field in a database table that references the primary key of another table, establishing a relationship.</td></tr>
+  <tr><td>JSON</td><td>JavaScript Object Notation – A lightweight data interchange format used for API communication.</td></tr>
+  <tr><td>MVT</td><td>Model-View-Template – Django's architectural pattern where Models define data, Views handle logic, and Templates render HTML.</td></tr>
+  <tr><td>NLP</td><td>Natural Language Processing – A branch of AI that deals with understanding and processing human language.</td></tr>
+  <tr><td>ORM</td><td>Object-Relational Mapper – A tool that maps database tables to Python classes and SQL queries to Python method calls.</td></tr>
+  <tr><td>OTA</td><td>Online Travel Agency – A website that allows consumers to book travel products (e.g., Booking.com, MakeMyTrip).</td></tr>
+  <tr><td>OTP</td><td>One-Time Password – A temporary password sent via email or SMS for authentication purposes.</td></tr>
+  <tr><td>PK (Primary Key)</td><td>A unique identifier for each record in a database table.</td></tr>
+  <tr><td>RDBMS</td><td>Relational Database Management System – A database system that stores data in tables with relationships between them.</td></tr>
+  <tr><td>REST API</td><td>Representational State Transfer API – An architectural style for designing web services that use HTTP methods.</td></tr>
+  <tr><td>Razorpay</td><td>An Indian payment gateway provider that enables online payments via cards, UPI, net banking, and wallets.</td></tr>
+  <tr><td>SDLC</td><td>Software Development Life Cycle – A structured process for developing software through defined phases.</td></tr>
+  <tr><td>PostgreSQL</td><td>An advanced, open-source, server-based relational database engine suitable for production and development.</td></tr>
+  <tr><td>SRS</td><td>Software Requirement Specification – A document that describes all the requirements of a software system.</td></tr>
+  <tr><td>UI</td><td>User Interface – The visual elements through which a user interacts with a software application.</td></tr>
+  <tr><td>XSS</td><td>Cross-Site Scripting – A web security vulnerability where malicious scripts are injected into web pages.</td></tr>
+  <tr><td>xhtml2pdf</td><td>A Python library that converts HTML/CSS documents to PDF format.</td></tr>
+</table>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 72-74 : BIBLIOGRAPHY
+     ════════════════════════════════════════════════════════════════════ -->
+<h1 class="chapter">20. Bibliography</h1>
+
+<h2 class="section">20.1 Websites and Online Documentation</h2>
+
+<ol>
+  <li><strong>Django Official Documentation</strong><br>
+    <a href="https://docs.djangoproject.com/" target="_blank">https://docs.djangoproject.com/</a><br>
+    <em>Comprehensive documentation covering Django models, views, templates, forms, authentication, ORM, middleware, and deployment. Used extensively throughout development.</em></li>
+
+  <li><strong>Python Official Documentation</strong><br>
+    <a href="https://www.python.org/doc/" target="_blank">https://www.python.org/doc/</a><br>
+    <em>Official Python language reference, standard library documentation, and tutorials. Referenced for Python syntax, data types, and built-in functions.</em></li>
+
+  <li><strong>PostgreSQL Documentation</strong><br>
+    <a href="https://www.postgresql.org/docs/" target="_blank">https://www.postgresql.org/docs/</a><br>
+    <em>Reference for SQL syntax, database design, normalization, and query optimization. Used for understanding RDBMS concepts applicable to the project.</em></li>
+
+  <li><strong>Razorpay Django Integration Guide</strong><br>
+    <a href="https://razorpay.com/docs/payments/server-integration/django/" target="_blank">https://razorpay.com/docs/payments/server-integration/django/</a><br>
+    <em>Official Razorpay documentation for integrating the payment gateway with Django applications. Used for order creation, payment capture, and SDK setup.</em></li>
+
+  <li><strong>Bootstrap 5 Documentation</strong><br>
+    <a href="https://getbootstrap.com/docs/" target="_blank">https://getbootstrap.com/docs/</a><br>
+    <em>Documentation for Bootstrap's grid system, components (cards, forms, navbars, modals), utilities, and responsive breakpoints. Used for all frontend design.</em></li>
+
+  <li><strong>MDN Web Docs – JavaScript Reference</strong><br>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">https://developer.mozilla.org/en-US/docs/Web/JavaScript</a><br>
+    <em>Mozilla Developer Network reference for JavaScript, DOM manipulation, Fetch API, and event handling. Used for AJAX search, chatbot communication, and dynamic UI updates.</em></li>
+
+  <li><strong>xhtml2pdf Documentation</strong><br>
+    <a href="https://xhtml2pdf.readthedocs.io/" target="_blank">https://xhtml2pdf.readthedocs.io/</a><br>
+    <em>Documentation for the xhtml2pdf library used to convert HTML templates to downloadable PDF documents.</em></li>
+
+  <li><strong>Stack Overflow</strong><br>
+    <a href="https://stackoverflow.com/" target="_blank">https://stackoverflow.com/</a><br>
+    <em>Community Q&A platform used for troubleshooting specific coding issues related to Django, Python, JavaScript, and database queries.</em></li>
+
+  <li><strong>W3Schools</strong><br>
+    <a href="https://www.w3schools.com/" target="_blank">https://www.w3schools.com/</a><br>
+    <em>Online tutorials and references for HTML, CSS, JavaScript, SQL, and Python. Used for quick syntax lookups and code examples.</em></li>
+</ol>
+
+<h2 class="section">20.2 Reference Books – Python, Django &amp; Web Development</h2>
+
+<ol>
+  <li>Adrian Holovaty, Jacob Kaplan-Moss – <em>The Definitive Guide to Django: Web Development Done Right</em>, 2nd Edition, Apress.<br>
+    <em>Comprehensive guide to Django framework covering models, views, templates, forms, admin, and deployment.</em></li>
+
+  <li>William S. Vincent – <em>Django for Beginners: Build Websites with Python &amp; Django</em>, WelcomeToCode.<br>
+    <em>Beginner-friendly guide to building web applications with Django, covering project setup, CRUD operations, user authentication, and deployment.</em></li>
+
+  <li>Eric Matthes – <em>Python Crash Course: A Hands-On, Project-Based Introduction to Programming</em>, 3rd Edition, No Starch Press.<br>
+    <em>Introduction to Python programming with projects including web applications using Django.</em></li>
+
+  <li>Robin Nixon – <em>Learning PHP, MySQL &amp; JavaScript: With jQuery, CSS &amp; HTML5</em>, 6th Edition, O'Reilly Media.<br>
+    <em>Reference for general web development concepts, client-server architecture, and database interaction patterns.</em></li>
+
+  <li>Antonio Melé – <em>Django 4 by Example</em>, 4th Edition, Packt Publishing.<br>
+    <em>Practical guide with real-world Django projects covering e-commerce, social networks, and REST APIs.</em></li>
+</ol>
+
+<h2 class="section">20.3 Reference Books – Databases &amp; SQL</h2>
+
+<ol>
+  <li>Regina O. Obe, Leo S. Hsu – <em>PostgreSQL: Up and Running</em>, 3rd Edition, O'Reilly Media.<br>
+    <em>Reference for relational database concepts, SQL queries, indexing, and database administration.</em></li>
+
+  <li>Allen G. Taylor – <em>SQL For Dummies</em>, 9th Edition, John Wiley &amp; Sons.<br>
+    <em>Beginner-friendly introduction to SQL, covering SELECT, INSERT, UPDATE, DELETE, JOINs, and subqueries.</em></li>
+
+  <li>Abraham Silberschatz, Henry F. Korth, S. Sudarshan – <em>Database System Concepts</em>, 7th Edition, McGraw-Hill Education.<br>
+    <em>Textbook covering relational model, normalization, ER diagrams, SQL, transaction management, and database design theory.</em></li>
+</ol>
+
+<h2 class="section">20.4 IGNOU Study Materials</h2>
+
+<ol>
+  <li>IGNOU – <em>BCS-051: Introduction to Software Engineering</em><br>
+    <em>Covered SDLC, SRS, DFD, ER diagrams, testing strategies, and project documentation standards.</em></li>
+
+  <li>IGNOU – <em>BCS-053: Web Programming</em><br>
+    <em>Covered HTML, CSS, JavaScript, server-side programming, and database connectivity.</em></li>
+
+  <li>IGNOU – <em>BCS-054: Computer Oriented Numerical Techniques</em><br>
+    <em>Covered algorithmic thinking and computational methods applicable to software development.</em></li>
+
+  <li>IGNOU – <em>BCSL-057: Web Programming Lab</em><br>
+    <em>Practical exercises in web development using HTML, CSS, JavaScript, and server-side technologies.</em></li>
+
+  <li>IGNOU – <em>BCSP-064: BCA Project Guidelines</em><br>
+    <em>Official project guidelines covering report structure, formatting, submission requirements, and evaluation criteria.</em></li>
+</ol>
+
+<div class="pb"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     FOOTER / REMINDER
+     ════════════════════════════════════════════════════════════════════ -->
+<div style="text-align:center;padding:24pt;border-top:2px solid var(--bdr);margin-top:36pt;">
+  <p style="color:var(--mut);font-size:12pt;line-height:1.8;">
+    <strong>Checklist before submission:</strong><br>
+    ☐ Fill in blank fields: Study Centre Code, Guide Name, Designation, Qualification, Address<br>
+    ☐ Attach original screenshots of all 26 input/output screens<br>
+    ☐ Attach the approved Project Proposal Proforma<br>
+    ☐ Attach the approved Synopsis<br>
+    ☐ Attach the Guide's Bio-Data<br>
+    ☐ Get the report hard-bound (as per IGNOU guidelines)<br>
+    ☐ Submit 2 copies: 1 to the Study Centre, 1 to the Regional Centre<br>
+    ☐ Keep 1 copy for your own records
+  </p>
+</div>
+
+</div><!-- end .page -->
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+{% extends '0index.html' %}
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div class="card custom-form-style">
+  <div class="card-body">
+    <h4 class="card-title">New services</h4>
+<!--    <p class="card-description">-->
+<!--      Basic form elements-->
+<!--    </p>-->
+    <form class="forms-sample" method="post" action="{% url 'update_staff_page' prop_id=pro.id %}"
+    enctype="multipart/form-data">
+        {% csrf_token %}
+      <!-- form elements here -->
+      <div class="form-group">
+        <label >Staff Name</label>
+        <input type="text" class="form-control"   name="sname" value="{{pro.STAFFNAME}}">
+      </div><br>
+
+        <div class="form-group">
+        <label >Designation</label>
+        <input type="text" class="form-control"   name="sdesignation" value="{{pro.STAFFDESIGNATION}}">
+      </div>
+
+        <div class="form-group">
+        <label >Facebook</label>
+        <input type="text" class="form-control"  name="sfacebook" value="{{pro.STAFFACEBOOK}}">
+      </div>
+
+        <div class="form-group">
+        <label >Instagram</label>
+        <input type="text" class="form-control"  name="sinstagram" value="{{pro.STAFFINSTA}}">
+      </div>
+
+
+       <div class="form-group">
+           <label >Upload image</label>
+          <img src="{{pro.STAFFIMAGE.url}}" width="100px" height="100px">
+           <input type="file" name="simage"  >
+       </div>
+
+
+
+
+
+
+     <button type="submit" class="btn btn-primary me-2" >Update</button>
+    </form>
+  </div>
+</div>
+
+
+<style>
+  .custom-form-style {
+    width: 100%;
+    margin-left: 20px;
+    margin-top: 30px;
+  }
+</style>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+{% if messages %}
+ {% for i in messages %}
+  {% if i.tags == 'warning' %}
+    <script>
+        swal('{{i}}','','warning')
+    </script>
+
+  {% elif i.tags == 'error' %}
+    <script>
+        swal('{{i}}','','error')
+    </script>
+  {% elif i.tags == 'info' %}
+    <script>
+        swal('{{i}}','','info')
+    </script>
+  {% else %}
+    <script>
+        swal('{{i}}','','success')
+    </script>
+{% endif %}
+{% endfor %}
+{% endif %}
+</body>
+</html>
+{% endblock %}

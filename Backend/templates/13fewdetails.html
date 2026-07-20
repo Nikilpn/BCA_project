@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+{% extends '0index.html' %}
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="card">
+                <div class="card-body" style="width:1000px;>
+                  <h4 class="card-title">Total Amount</h4>
+                  <p class="card-description">
+                    Total Amount <code>User</code>
+                  </p>
+                  <div class="table-responsive pt-3">
+                    <table class="table table-bordered">
+                      <thead>
+
+                        <tr>
+                          <th>id</th>
+                            <th>Customer name</th>
+                            <th>mobile</th>
+
+                             <th>Total Amount</th>
+                            <th>delete</th>
+
+                        </tr>
+                      </thead>
+                      <tbody>
+   {% for d in data %}
+                        <tr >
+
+
+                            <th>{{d.id}}</th>
+                           <th>{{d.CUSTOMERNAME}}</th>
+                            <th>{{d.MOBILE}}</th>
+                            <th>{{d.TOTALPRICE}}</th>
+
+
+                                 <td>
+                                <a href="{% url 'deletecustomertotalamount_page' del_id=d.id %}">
+                                <button type="button" class="btn btn-danger">Delete</button>
+                                   </a>
+                               </td>
+
+
+
+
+
+
+
+
+                        </tr>
+    {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+{% extends '0index.html' %}
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div class="card custom-form-style">
+  <div class="card-body">
+    <h4 class="card-title">New services</h4>
+<!--    <p class="card-description">-->
+<!--      Basic form elements-->
+<!--    </p>-->
+    <form class="forms-sample" method="post" action="{% url 'save_staff_page' %}"
+    enctype="multipart/form-data">
+        {% csrf_token %}
+      <!-- form elements here -->
+      <div class="form-group">
+        <label for="exampleInputName1">Staff Name</label>
+        <input type="text" class="form-control" id="exampleInputName1" placeholder="Name" name="sname">
+      </div><br>
+
+        <div class="form-group">
+        <label for="exampleInputName1">Designation</label>
+        <input type="text" class="form-control" id="exampleInputName1" placeholder="Name" name="sdesignation">
+      </div>
+
+        <div class="form-group">
+        <label for="exampleInputName1">Facebook</label>
+        <input type="text" class="form-control" id="exampleInputName1" placeholder="Name" name="sfacebook">
+      </div>
+
+        <div class="form-group">
+        <label for="exampleInputName1">Instagram</label>
+        <input type="text" class="form-control" id="exampleInputName1" placeholder="Name" name="sinstagram">
+      </div>
+
+
+       <div class="form-group">
+           <label >Upload image</label>
+           <input type="file" name="simage" >
+       </div>
+
+
+
+
+
+
+     <button type="submit" class="btn btn-primary me-2" >submit</button>
+    </form>
+  </div>
+</div>
+
+
+<style>
+  .custom-form-style {
+    width: 100%;
+    margin-left: 20px;
+    margin-top: 30px;
+  }
+</style>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+{% if messages %}
+ {% for i in messages %}
+  {% if i.tags == 'warning' %}
+    <script>
+        swal('{{i}}','','warning')
+    </script>
+
+  {% elif i.tags == 'error' %}
+    <script>
+        swal('{{i}}','','error')
+    </script>
+  {% elif i.tags == 'info' %}
+    <script>
+        swal('{{i}}','','info')
+    </script>
+  {% else %}
+    <script>
+        swal('{{i}}','','success')
+    </script>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+</body>
+</html>
+{% endblock %}

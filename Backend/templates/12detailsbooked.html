@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+{% extends '0index.html' %}
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="card">
+                <div class="card-body" style="width:1000px;>
+                  <h4 class="card-title">Details</h4>
+                  <p class="card-description">
+                    Details of<code>User</code>
+                  </p>
+                  <div class="table-responsive pt-3">
+                    <table class="table table-bordered">
+                      <thead>
+
+                        <tr>
+                          <th>id</th>
+                            <th>Customer name</th>
+                          <th>email</th>
+                          <th>Checkin</th>
+                           <th>Checkout</th>
+                          <th>Total adults</th>
+
+
+                            <th>Selectedroom</th>
+
+                           <th>Special request</th>
+                             <th>Total price payed</th>
+                            <th>delete</th>
+
+                        </tr>
+                      </thead>
+                      <tbody>
+   {% for d in data %}
+                        <tr >
+
+
+                            <th>{{d.id}}</th>
+                            <th>{{d.CUSTOMERNAME}}</th>
+                            <th>{{d.CONTACTEMAIL}}</th>
+                            <th>{{d.CHECKIN}}</th>
+                            <th>{{d.CHECKOUT}}</th>
+                            <th>{{d.TOTALADULTS}}</th>
+                            <th>{{d.TOTALCHILDS}}</th>
+                            <th>{{d.SELECTROOM}}</th>
+                            <th>{{d.SPECIALREQUEST}}</th>
+                            <th>{{d.TOTALPRICE}}</th>
+
+                            <td>
+                                 <td>
+                                <a href="{% url 'deletebooked_details' del_id=d.id %}">
+                                <button type="button" class="btn btn-danger">Delete</button>
+                                   </a>
+                               </td>
+                            </td>
+
+
+
+
+
+
+
+                        </tr>
+    {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+</body>
+</html>
+{% endblock %}

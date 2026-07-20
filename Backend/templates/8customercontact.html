@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{% extends '0index.html' %}
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="card">
+                <div class="card-body" style="width:1000px;>
+                  <h4 class="card-title">Messages from user</h4>
+                  <p class="card-description">
+                    Received <code>Messages</code>
+                  </p>
+                  <div class="table-responsive pt-3">
+                    <table class="table table-bordered">
+                      <thead>
+
+                        <tr>
+                          <th>id</th>
+                            <th>CustomerName</th>
+                          <th>Email</th>
+                          <th>Mobile</th>
+                           <th>Subject</th>
+                          <th>Message</th>
+
+
+
+                           <th>Delete</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+
+                        {% for d in data %}
+                        <tr >
+                          <td>{{d.id}}</td>
+                            <td>{{d.CONTACTNAME}}</td>
+                            <td>{{d.CONTACTEMAIL}}</td>
+                           <td>{{d.CONTACTNUMBER}}</td>
+
+                            <td>{{d.CONTACTSUBJECT}}</td>
+                            <td>{{d.CONTACTMESSAGE}}</td>
+
+
+
+                            <td>
+                                <a href="{% url 'delete_customer_contact_details_page' del_id=d.id %}" >
+                                <button type="button" class="btn btn-danger">Delete</button>
+                                   </a>
+                               </td>
+
+
+                        </tr>
+                      {% endfor %}
+
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+</body>
+</html>
+{% endblock %}
