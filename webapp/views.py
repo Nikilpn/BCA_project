@@ -4,7 +4,13 @@ from django.shortcuts import render, redirect
 from Backend.models import roomnamedb, roomtypedb, staffdb
 from webapp.models import customercontactdb, bookingdb, Registerdb, Totaldb
 from django.contrib import messages
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from Hotelierss.settings import EMAIL_HOST_USER
+from django.contrib.auth.hashers import make_password, check_password
 import razorpay
+from xhtml2pdf import pisa
 
 
 # Create your views here.
@@ -347,6 +353,7 @@ def save_customer_contact_page(request):
         obj.save()
         messages.success(request, "Message Send successfully")
         return redirect(customer_contact_page)
+    return redirect(customer_contact_page)
 
 
 # for getting specific roomsname(roomnumber1,roomnumber2)  inherited from roomtype(luxury,specific,lowclass)
@@ -366,17 +373,21 @@ def filtered_room_name(request, room_name):
     return render(request, "6roomname_filtered.html", {'data': data})
 
 
-def save_room_page(request):
-    return render(request, "7savedroom.html")
-
-
 def booking_page(request, pro_id):
+    if 'USERNAME' not in request.session:
+        return redirect(signin_page)
     data = bookingdb.objects.filter(CUSTOMERNAME=request.session['USERNAME'])
-    cat = roomnamedb.objects.get(id=pro_id)
+    try:
+        cat = roomnamedb.objects.get(id=pro_id)
+    except roomnamedb.DoesNotExist:
+        messages.error(request, "Room not found.")
+        return redirect(home_page)
     return render(request, "7booking.html", {'cat': cat, 'data': data})
 
 
 def save_room_page(request):
+    if 'USERNAME' not in request.session:
+        return redirect(signin_page)
     global total
     data = bookingdb.objects.filter(CUSTOMERNAME=request.session['USERNAME'])
     subtotal = 0
@@ -397,24 +408,30 @@ def save_room_page(request):
 def save_roompages_input(request):
     if request.method == "POST":
         na = request.POST.get('customername')
-        mb = request.POST.get('customermobile')  # Now CharField, no conversion needed
+        mb = request.POST.get('customermobile')
         tl = request.POST.get('totalprice')
         
-        # Optionally link to the last booking made by this customer
         last_booking = None
         if 'USERNAME' in request.session:
             last_booking = bookingdb.objects.filter(
                 CUSTOMERNAME=request.session['USERNAME']
             ).order_by('-id').first()
         
+        try:
+            total_val = int(tl) if tl else None
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid total price.")
+            return redirect(save_room_page)
+        
         obj = Totaldb(
             BOOKING=last_booking,
             CUSTOMERNAME=na, 
-            MOBILE=mb,  # Now CharField
-            TOTALPRICE=int(tl) if tl else None
+            MOBILE=mb,
+            TOTALPRICE=total_val
         )
         obj.save()
         return redirect(payment_page)
+    return redirect(save_room_page)
 
 
 def delete_item(request, pro_id):
@@ -432,65 +449,31 @@ def save_booking_page(request, CONTACTEMAIL=None):
         cho = request.POST.get('bcheckout')
         ta = request.POST.get('btotaladults')
         tc = request.POST.get('btotalchilds')
-        sr_id = request.POST.get('bselectroom')  # This is now the room ID
+        sr_id = request.POST.get('bselectroom')
         sre = request.POST.get('bspecialrequest')
         tp = request.POST.get('btotalprice')
 
-        # Parse dates from string to proper date objects
         from datetime import datetime
         try:
-            checkin_date = datetime.strptime(chn, '%Y-%m-%d').date() if '-' in chn else datetime.strptime(chn, '%m/%d/%Y').date()
-            checkout_date = datetime.strptime(cho, '%Y-%m-%d').date() if '-' in cho else datetime.strptime(cho, '%m/%d/%Y').date()
+            checkin_date = datetime.strptime(chn, '%Y-%m-%d').date()
+            checkout_date = datetime.strptime(cho, '%Y-%m-%d').date()
         except (ValueError, TypeError):
             messages.error(request, "Invalid date format.")
             return redirect('save_room_page')
-
-        # Validate: checkin must be before checkout
         if checkin_date >= checkout_date:
             messages.error(request, "Check-out date must be after check-in date.")
             return redirect('save_room_page')
-
-        # Validate: checkin must not be in the past
         from datetime import date
         if checkin_date < date.today():
             messages.error(request, "Check-in date cannot be in the past.")
             return redirect('save_room_page')
 
-        # obj = bookingdb(CUSTOMERNAME=na, CONTACTEMAIL=em, CHECKIN=chn, CHECKOUT=cho, TOTALADULTS=ta, TOTALCHILDS=tc,
-        #                 SELECTROOM=sr, SPECIALREQUEST=sre, TOTALPRICE=tp)
-        # # Check for overlapping bookings
-        # overlapping_bookings = bookingdb.objects.filter(
-        #     SELECTROOM=sr,
-        #     CHECKIN=chn,
-        #     CHECKOUT=cho
-        # )
-        #
-        # if overlapping_bookings.exists():
-        #     messages.error(request, "The selected room is already booked for the specified dates.")
-        #     return redirect('save_room_page')  # Redirect back to the booking form page
-        #
-        # # If no overlap, save the booking
-        #
-        # messages.success(request, "saved room successfully")
-        #
-        #
-        #
-        # obj.save()
-        #
-        # messages.success(request, "Room booked successfully.")
-        # subject = "Conragatulations roombooked"
-        # message = f"Dear customer you have booked a room succesfully :   Thank you "
-        # send_mail(subject, message, EMAIL_HOST_USER, [obj.CONTACTEMAIL], fail_silently=True, )
-        #
-        # return redirect(save_room_page)
-        # Get the room object from the ID
         try:
             room_obj = roomnamedb.objects.get(id=sr_id)
         except roomnamedb.DoesNotExist:
             messages.error(request, "Invalid room selection.")
             return redirect('save_room_page')
-        
-        # Check for overlapping bookings with the ForeignKey and DateField
+
         overlapping_bookings = bookingdb.objects.filter(
             SELECTROOM=room_obj
         ).filter(
@@ -500,9 +483,8 @@ def save_booking_page(request, CONTACTEMAIL=None):
 
         if overlapping_bookings.exists():
             messages.error(request, "The selected room is already booked for the specified dates.")
-            return redirect('save_room_page')  # Redirect back to the booking form page
+            return redirect('save_room_page')
         else:
-            # Get the customer if logged in
             customer_obj = None
             if 'USERNAME' in request.session:
                 try:
@@ -510,8 +492,7 @@ def save_booking_page(request, CONTACTEMAIL=None):
                 except Registerdb.DoesNotExist:
                     pass
 
-            # If no overlap, save the booking
-            obj = bookingdb(
+            bookingdb.objects.create(
                 CUSTOMER=customer_obj,
                 CUSTOMERNAME=na,
                 CONTACTEMAIL=em,
@@ -519,22 +500,18 @@ def save_booking_page(request, CONTACTEMAIL=None):
                 CHECKOUT=checkout_date,
                 TOTALADULTS=int(ta) if ta else None,
                 TOTALCHILDS=int(tc) if tc else None,
-                SELECTROOM=room_obj,  # Now a ForeignKey
+                SELECTROOM=room_obj,
                 SPECIALREQUEST=sre,
                 TOTALPRICE=int(tp) if tp else None
             )
-            obj.save()
 
             messages.success(request, "Room booked successfully.")
-
-            # Send confirmation email
             subject = "Congratulations roombooked"
-            message = f"Dear customer you have booked a room succesfully :   Thank you & have a nice day ,Hoteliers"
-            send_mail(subject, message, EMAIL_HOST_USER, [obj.CONTACTEMAIL], fail_silently=True, )
+            message = "Dear customer you have booked a room successfully. Thank you & have a nice day, Hoteliers"
+            send_mail(subject, message, EMAIL_HOST_USER, [em], fail_silently=True)
             return redirect('save_room_page')
+    return redirect('save_room_page')
 
-
-        return redirect('save_room_page')  # If not POST, just redirect
 
 def rooms_pages_new(request):
     cat = roomtypedb.objects.all()
@@ -567,7 +544,7 @@ def save_user(request):
         p1 = request.POST.get('pass1')
         p2 = request.POST.get('pass2')
         hashed = make_password(p1)
-        obj = Registerdb(USERNAME=na, EMAIL=em, PASSWORD=hashed, CONFIRMPASSWORD=hashed)
+        obj = Registerdb(USERNAME=na, EMAIL=em, PASSWORD=hashed)
         obj.save()
         messages.success(request, "signup successfully")
         return redirect(signin_page)
@@ -581,7 +558,6 @@ def user_login_page(request):
             user = Registerdb.objects.get(USERNAME=un)
             if check_password(pswd, user.PASSWORD):
                 request.session['USERNAME'] = un
-                request.session['PASSWORD'] = pswd
                 messages.success(request, "signin successfully")
                 return redirect(home_page)
             else:
@@ -590,13 +566,13 @@ def user_login_page(request):
         except Registerdb.DoesNotExist:
             messages.warning(request, "signin failed")
             return redirect(signin_page)
+    return redirect(signin_page)
 
     # for deleteing session userlogout
 
 
 def userlogout_page(request):
-    del request.session['USERNAME']
-    del request.session['PASSWORD']
+    request.session.flush()
     messages.success(request, "signout successfully")
     return redirect(home_page)
 
@@ -604,26 +580,19 @@ def userlogout_page(request):
 # for payment
 def payment_page(request):
     customer = Totaldb.objects.order_by('-id').first()
+    if not customer or not customer.TOTALPRICE:
+        messages.error(request, "No payment details found.")
+        return redirect(home_page)
     payy = customer.TOTALPRICE
     amount = int(payy * 100)
     payy_str = str(amount)
-    for i in payy_str:
-        print(i)
     if request.method == "POST":
         order_currency = 'INR'
         client = razorpay.Client(auth=('rzp_test_klfWwvjaFXjXmC', 's9P7dwOwYckK352FfRJOXIRV'))
         payment = client.order.create({'amount': amount, 'currency': order_currency, 'payment_capture': '1'})
-
     return render(request, "payment.html", {'customer': customer, 'payy_str': payy_str})
 
 
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from xhtml2pdf import pisa
-
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from xhtml2pdf import pisa
 
 
 def generate_pdf(request):
@@ -650,17 +619,6 @@ def generate_pdf(request):
     if pisa_status.err:
         return HttpResponse('We had some errors <pre>' + html_string + '</pre>')
     return response
-
-
-from django.core.mail import send_mail
-from django.core.mail import EmailMessage
-from Hotelierss.settings import EMAIL_HOST_USER
-from django.core.mail import EmailMessage
-
-
-
-
-
 
 
  #for generating otp starts here
@@ -713,18 +671,7 @@ def passwordReset_verify_otp(request,user_id):
     else:
         return redirect("user_login_page")
 
-from django.contrib.auth.hashers import make_password, check_password
 
-def hash_existing_passwords():
-    """One-time migration: hash all plain-text passwords in Registerdb."""
-    from webapp.models import Registerdb
-    for user in Registerdb.objects.all():
-        if not user.PASSWORD.startswith('pbkdf2_'):
-            user.PASSWORD = make_password(user.PASSWORD)
-            user.save(update_fields=['PASSWORD'])
-
-# Run on startup for this session (no-op if already hashed)
-hash_existing_passwords()
 
 def reset_password(request, username):
     if request.method == "POST":

@@ -26,7 +26,10 @@ def save_roomtype_page(request):
     if request.method == "POST":
         rt=request.POST.get('roomtype')
         ds = request.POST.get('description')
-        img=request.FILES['images']
+        img=request.FILES.get('images')
+        if not img:
+            messages.error(request, "Image is required")
+            return redirect(roomtype_page)
         obj=roomtypedb(ROOMTYPE=rt,DESCRIPTION=ds,ROOMTYPEIMAGE=img)
         obj.save()
         messages.success(request,"Roomtype saved succesfully")
@@ -169,7 +172,6 @@ def admin_login(request):
             if x is not None:
                 login(request,x)
                 request.session['username']=un
-                request.session['password']=pwd
                 messages.success(request, "Login successful")
                 return redirect(index_page)
             else:
@@ -181,15 +183,14 @@ def admin_login(request):
 
 
 def admin_logout(request):
-    del request.session['username']
-    del request.session['password']
+    from django.contrib.auth import logout
+    logout(request)
     messages.success(request, "Logout sucessfully")
     return redirect(login_page_admin)
 
 #Displaying Webapp(customersendingcontactmessage) in to Backend (8customercontacthtml page)
 #connecting Webapp(db) and Backend
 
-from webapp.models import customercontactdb
 @login_required(login_url='/Backend/login_page_admin/')
 def contact_details_page(request):
     data=customercontactdb.objects.all()

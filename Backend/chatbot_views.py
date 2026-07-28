@@ -2,8 +2,8 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json
-from datetime import datetime, timedelta
-from Backend.models import roomnamedb, roomtypedb, staffdb, ChatbotResponse, ChatbotConversation, Notification
+from datetime import datetime
+from Backend.models import roomnamedb, staffdb, ChatbotConversation, Notification
 from webapp.models import bookingdb
 
 @csrf_exempt
@@ -85,10 +85,11 @@ def handle_room_query(user_message, username, response):
         response['suggestions'] = ['Show available dates', 'Search by date range']
     
     elif 'luxury' in user_message or 'deluxe' in user_message or 'suite' in user_message:
+        keyword = 'luxury' if 'luxury' in user_message else ('deluxe' if 'deluxe' in user_message else 'suite')
         rooms = roomnamedb.objects.filter(
-            ROOMTYPE__ROOMTYPE__icontains='luxury'
-        ) if 'luxury' in user_message else roomnamedb.objects.all()
-        
+            ROOMTYPE__ROOMTYPE__icontains=keyword
+        )
+
         room_list = [{
             'id': room.id,
             'name': room.ROOMNAME,
