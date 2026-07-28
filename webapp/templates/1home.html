@@ -292,7 +292,7 @@ Welcome to megha, your premier destination for comfort and luxury! Nestled in th
                         <div class="room-item shadow rounded overflow-hidden">
 
                             <div class="position-relative" >
-                                <img class="img-fluid" src="{{i.ROOMTYPEIMAGE.url}}" width="400px"  height="400px" alt="">
+                                <img class="img-fluid" src="{% if i.ROOMTYPEIMAGE %}{{i.ROOMTYPEIMAGE.url}}{% else %}/static/images/default-user.png{% endif %}" width="400px"  height="400px" alt="">
                                 <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">$100/Night</small>
                             </div>
                             <div class="p-4 mt-2">

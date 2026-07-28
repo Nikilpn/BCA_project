@@ -37,7 +37,7 @@
                             <td>{{d.DESCRIPTION}}</td>
 
                             <td>
-                          <img src="{{d.ROOMTYPEIMAGE.url}}" ><br><br>
+                          <img src="{% if d.ROOMTYPEIMAGE %}{{d.ROOMTYPEIMAGE.url}}{% else %}/static/images/default-user.png{% endif %}" ><br><br>
                         </td>
 
                             <td>

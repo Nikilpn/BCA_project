@@ -196,7 +196,7 @@
                     <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="room-item shadow rounded overflow-hidden">
                             <div class="position-relative">
-                                <img class="img-fluid custom-img-size" src="{{i.ROOMIMAGE.url}}" width="400px" height="400px" alt="">
+                                <img class="img-fluid custom-img-size" src="{% if i.ROOMIMAGE %}{{i.ROOMIMAGE.url}}{% else %}/static/images/default-user.png{% endif %}" width="400px" height="400px" alt="">
                                 <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">Rs.{{i.ROOMPRICE}}</small>
                             </div>
                             <div class="p-4 mt-2">

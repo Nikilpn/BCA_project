@@ -39,7 +39,7 @@
                             <td>{{d.ROOMNAME}}</td>
 
                             <td>
-                                <img src="{{d.ROOMIMAGE.url}}" width="100px" height="100px">
+                                <img src="{% if d.ROOMIMAGE %}{{d.ROOMIMAGE.url}}{% else %}/static/images/default-user.png{% endif %}" width="100px" height="100px">
                             </td>
 
                             <td>{{d.ROOMPRICE}}</td>

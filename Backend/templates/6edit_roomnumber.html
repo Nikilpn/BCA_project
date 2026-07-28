@@ -40,7 +40,7 @@
        <div class="form-group">
            <label>Room image</label>
            <input type="file" name="roomimage" >
-           <img src="{{pro.ROOMIMAGE.url}}" height="230px" width="230px">
+           <img src="{% if pro.ROOMIMAGE %}{{pro.ROOMIMAGE.url}}{% else %}/static/images/default-user.png{% endif %}" height="230px" width="230px">
        </div>
 
  <div class="form-group">

@@ -41,7 +41,7 @@
                             <td>{{d.STAFFINSTA}}</td>
 
                             <td>
-                                <img src="{{d.STAFFIMAGE.url}}" width="100px" height="100px">
+                                <img src="{% if d.STAFFIMAGE %}{{d.STAFFIMAGE.url}}{% else %}/static/images/default-user.png{% endif %}" width="100px" height="100px">
                             </td>
 
 

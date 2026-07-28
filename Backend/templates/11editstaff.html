@@ -41,7 +41,7 @@
 
        <div class="form-group">
            <label >Upload image</label>
-          <img src="{{pro.STAFFIMAGE.url}}" width="100px" height="100px">
+          <img src="{% if pro.STAFFIMAGE %}{{pro.STAFFIMAGE.url}}{% else %}/static/images/default-user.png{% endif %}" width="100px" height="100px">
            <input type="file" name="simage"  >
        </div>
 

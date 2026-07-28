@@ -146,18 +146,19 @@ def admin_login(request):
     if request.method=="POST":
         un=request.POST.get('username')
         pwd = request.POST.get('pass')
-        if User.objects.filter(username__contains=un).exists():
+        if User.objects.filter(username=un).exists():
             x=authenticate(username=un,password=pwd)
             if x is not None:
                 login(request,x)
                 request.session['username']=un
                 request.session['password']=pwd
+                messages.success(request, "Login successful")
                 return redirect(index_page)
             else:
-                messages.warning(request, "Login failed")
+                messages.warning(request, "Login failed - Invalid password")
                 return redirect(login_page_admin)
         else:
-            messages.success(request, "login succesfully")
+            messages.warning(request, "Login failed - Username not found")
             return redirect(login_page_admin)
 
 

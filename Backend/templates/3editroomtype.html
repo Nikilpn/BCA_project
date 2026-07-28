@@ -26,7 +26,7 @@
 
          <div class="form-group">
            <label for="exampleTextarea1">Edit image</label>
-           <img src="{{cat.ROOMTYPEIMAGE.url}}" width="100px" height="100px">
+           <img src="{% if cat.ROOMTYPEIMAGE %}{{cat.ROOMTYPEIMAGE.url}}{% else %}/static/images/default-user.png{% endif %}" width="100px" height="100px">
            <input type="file" name="images" >
        </div>
 
