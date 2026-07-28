@@ -283,13 +283,13 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating">
-                                            <input type="date" name="bcheckin" class="form-control" id="checkin" placeholder="Check In" required />
+                                            <input type="date" name="bcheckin" class="form-control" id="checkin" placeholder="Check In" min="{% now 'Y-m-d' %}" required />
                                             <label for="checkin">Check In</label>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating">
-                                            <input type="date" class="form-control" id="checkout" name="bcheckout" placeholder="Check Out" required />
+                                            <input type="date" class="form-control" id="checkout" name="bcheckout" placeholder="Check Out" min="{% now 'Y-m-d' %}" required />
                                             <label for="checkout">Check Out</label>
                                         </div>
                                     </div>
@@ -323,7 +323,7 @@
                                         <input type="hidden" name="bselectroom" value="{{cat.id}}">
                                           <div class="col-md-12">
                                                 <label for="name">Amount Payable RS.</label>
-                                            <input type="text" class="form-control" value="{{cat.ROOMPRICE}}" name="btotalprice"><br>
+                                            <input type="text" class="form-control" value="{{cat.ROOMPRICE}}" name="btotalprice" readonly><br>
 
                                         </div>
 

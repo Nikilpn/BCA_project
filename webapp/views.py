@@ -436,6 +436,26 @@ def save_booking_page(request, CONTACTEMAIL=None):
         sre = request.POST.get('bspecialrequest')
         tp = request.POST.get('btotalprice')
 
+        # Parse dates from string to proper date objects
+        from datetime import datetime
+        try:
+            checkin_date = datetime.strptime(chn, '%Y-%m-%d').date() if '-' in chn else datetime.strptime(chn, '%m/%d/%Y').date()
+            checkout_date = datetime.strptime(cho, '%Y-%m-%d').date() if '-' in cho else datetime.strptime(cho, '%m/%d/%Y').date()
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid date format.")
+            return redirect('save_room_page')
+
+        # Validate: checkin must be before checkout
+        if checkin_date >= checkout_date:
+            messages.error(request, "Check-out date must be after check-in date.")
+            return redirect('save_room_page')
+
+        # Validate: checkin must not be in the past
+        from datetime import date
+        if checkin_date < date.today():
+            messages.error(request, "Check-in date cannot be in the past.")
+            return redirect('save_room_page')
+
         # obj = bookingdb(CUSTOMERNAME=na, CONTACTEMAIL=em, CHECKIN=chn, CHECKOUT=cho, TOTALADULTS=ta, TOTALCHILDS=tc,
         #                 SELECTROOM=sr, SPECIALREQUEST=sre, TOTALPRICE=tp)
         # # Check for overlapping bookings
@@ -474,8 +494,8 @@ def save_booking_page(request, CONTACTEMAIL=None):
         overlapping_bookings = bookingdb.objects.filter(
             SELECTROOM=room_obj
         ).filter(
-            CHECKIN__lte=cho,
-            CHECKOUT__gte=chn
+            CHECKIN__lte=checkout_date,
+            CHECKOUT__gte=checkin_date
         )
 
         if overlapping_bookings.exists():
@@ -495,8 +515,8 @@ def save_booking_page(request, CONTACTEMAIL=None):
                 CUSTOMER=customer_obj,
                 CUSTOMERNAME=na,
                 CONTACTEMAIL=em,
-                CHECKIN=chn,
-                CHECKOUT=cho,
+                CHECKIN=checkin_date,
+                CHECKOUT=checkout_date,
                 TOTALADULTS=int(ta) if ta else None,
                 TOTALCHILDS=int(tc) if tc else None,
                 SELECTROOM=room_obj,  # Now a ForeignKey
@@ -546,7 +566,8 @@ def save_user(request):
         em = request.POST.get('email')
         p1 = request.POST.get('pass1')
         p2 = request.POST.get('pass2')
-        obj = Registerdb(USERNAME=na, EMAIL=em, PASSWORD=p1, CONFIRMPASSWORD=p2)
+        hashed = make_password(p1)
+        obj = Registerdb(USERNAME=na, EMAIL=em, PASSWORD=hashed, CONFIRMPASSWORD=hashed)
         obj.save()
         messages.success(request, "signup successfully")
         return redirect(signin_page)
@@ -556,17 +577,19 @@ def user_login_page(request):
     if request.method == "POST":
         un = request.POST.get('uname')
         pswd = request.POST.get('upassword')
-        if Registerdb.objects.filter(USERNAME=un, PASSWORD=pswd).exists():
-            request.session['USERNAME'] = un
-            request.session['PASSWORD'] = pswd
-            messages.success(request, "signin successfully")
-            return redirect(home_page)
-
-        else:
+        try:
+            user = Registerdb.objects.get(USERNAME=un)
+            if check_password(pswd, user.PASSWORD):
+                request.session['USERNAME'] = un
+                request.session['PASSWORD'] = pswd
+                messages.success(request, "signin successfully")
+                return redirect(home_page)
+            else:
+                messages.warning(request, "signin failed")
+                return redirect(signin_page)
+        except Registerdb.DoesNotExist:
             messages.warning(request, "signin failed")
             return redirect(signin_page)
-    else:
-        return redirect(signin_page)
 
     # for deleteing session userlogout
 
@@ -690,7 +713,19 @@ def passwordReset_verify_otp(request,user_id):
     else:
         return redirect("user_login_page")
 
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
+
+def hash_existing_passwords():
+    """One-time migration: hash all plain-text passwords in Registerdb."""
+    from webapp.models import Registerdb
+    for user in Registerdb.objects.all():
+        if not user.PASSWORD.startswith('pbkdf2_'):
+            user.PASSWORD = make_password(user.PASSWORD)
+            user.save(update_fields=['PASSWORD'])
+
+# Run on startup for this session (no-op if already hashed)
+hash_existing_passwords()
+
 def reset_password(request, username):
     if request.method == "POST":
         try:
@@ -704,7 +739,8 @@ def reset_password(request, username):
 
         if password1 == password2:
             try:
-                Registerdb.objects.filter(USERNAME=username).update(PASSWORD=password1)
+                hashed = make_password(password1)
+                Registerdb.objects.filter(USERNAME=username).update(PASSWORD=hashed)
                 messages.success(request, "Your password has been reset successfully! "
                                           "You can now log in with your new password.")
                 subject = "Password Changed"

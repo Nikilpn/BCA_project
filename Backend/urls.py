@@ -52,4 +52,7 @@ urlpatterns=[
     path('api/notifications/', chatbot_views.get_notifications, name="get_notifications"),
     path('api/notifications/mark-read/', chatbot_views.mark_notification_read, name="mark_notification_read"),
 
+# Auth Token APIs
+    path('api/register/', views.admin_register, name="admin_register"),
+    path('api/token-login/', views.admin_token_login, name="admin_token_login"),
 ]
