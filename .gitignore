@@ -139,3 +139,22 @@ cython_debug/
 *.bak
 *.swp
 *.tmp
+*~
+
+# Command Code (agent) config - not part of the project
+.commandcode/
+
+# Document / report working folders and backups
+projectreport/
+projectreportnewlates/
+mainprojectreport/
+report_images/
+report_images_opt/
+new/
+*.doc
+*.docx
+*.doc.backup
+*.pdf
+*.htm
+*.html.bak
+*.~lock.*#

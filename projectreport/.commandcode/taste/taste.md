@@ -1,8 +1,0 @@
-- Communicates in a mix of Malayalam and English (Manglish), preferring code-switching in instructions. Confidence: 0.9
-- Prefers high-level task delegation — gives the goal ("make it 75-80 pages") without specifying exact edits, trusting the assistant to work out implementation details. Confidence: 0.8
-- Works with `.docx` files and expects programmatic manipulation via Python (python-docx) for document editing tasks. Confidence: 0.9
-- Tolerant of iterative refinement — does not object when multiple passes/attempts are needed to achieve the desired result. Confidence: 0.7
-- Proactively validates work: explicitly asks the assistant to check for structural errors (empty headings, duplicate content, incorrect section ordering) before considering a task done. Confidence: 0.8
-- Cares about formal academic document integrity: expects correct section numbering order (e.g., 3.4 not before 3.3), no empty section headings, no duplicate/redundant content, and proper heading hierarchy in `.docx` reports. Confidence: 0.8
-- Prefers the assistant to diagnose errors before fixing: explicitly asks "are there any errors?" and expects a clear, enumerated list of issues before any corrective action is taken. Confidence: 0.7
-- Expects a detailed, section-by-section debrief of changes made after a document modification task, including exactly where content was added ("evide okkey add cheythath kooduthal ayit") — not just a high-level summary. Confidence: 0.7
