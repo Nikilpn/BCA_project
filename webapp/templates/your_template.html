@@ -4,60 +4,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thank You for Your Purchase</title>
+    <title>Booking Report</title>
     <style>
+        @page {
+            size: A4;
+            margin: 12mm;
+        }
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            color: #333;
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            text-align: center;
         }
         h1 {
             color: #333;
+            text-align: center;
+            font-size: 18px;
+            margin: 0 0 6px 0;
         }
-        p {
-            color: #666;
-            line-height: 1.6;
+        h3 {
+            color: #555;
+            font-size: 13px;
+            margin: 8px 0 4px 0;
+        }
+        .info {
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+        .info p {
+            margin: 2px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+            font-size: 10px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+            padding: 4px;
+            text-align: left;
+        }
+        td {
+            padding: 4px;
+        }
+        .totals {
+            margin-top: 4px;
+            text-align: right;
+            font-size: 12px;
+        }
+        .totals p {
+            margin: 2px 0;
         }
         .signature {
-            margin-top: 30px;
+            margin-top: 12px;
             color: #333;
+            font-size: 12px;
+        }
+        .signature p {
+            margin: 1px 0;
         }
         .signature img {
-            margin-top: 10px;
-            width: 150px;
+            margin-top: 4px;
+            width: 110px;
             height: auto;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <h1>Hoteliers Booking Report</h1>
+    <div class="info">
+        <p><strong>Customer:</strong> {{ username }} &nbsp;|&nbsp; <strong>Date:</strong> {% now "F j, Y" %}</p>
+    </div>
 
-        <h1>Dear {{username}},</h1>
+    {% if data %}
+    <h3>Your Bookings</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Room</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Adults</th>
+                <th>Children</th>
+                <th>Special Request</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in data %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ d.SELECTROOM }}</td>
+                <td>{{ d.CHECKIN|date:"F j, Y" }}</td>
+                <td>{{ d.CHECKOUT|date:"F j, Y" }}</td>
+                <td>{{ d.TOTALADULTS }}</td>
+                <td>{{ d.TOTALCHILDS }}</td>
+                <td>{{ d.SPECIALREQUEST|default:"-" }}</td>
+                <td>₹{{ d.TOTALPRICE }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
+    <div class="totals">
+        <p><strong>Subtotal:</strong> ₹{{ subtotal }} &nbsp; <strong>Tax:</strong> ₹{{ tax }} &nbsp; <strong>Total:</strong> ₹{{ total }}</p>
+    </div>
+    {% else %}
+    <p>You have no bookings yet.</p>
+    {% endif %}
 
-        <p>Thank you for choosing to purchase from us! We are thrilled to have you as a customer and are confident that you will love your new product.</p>
-        <p>Your support means the world to us, and we are committed to ensuring that you have an exceptional experience. If you have any questions or need assistance, please do not hesitate to reach out to us.</p>
-        <p>We look forward to serving you again in the future. Thank you for your trust and business!</p>
-        <div class="signature">
-            <p>Sincerely,</p>
-            <p>Nikhil</p>
-            <p>Owner</p>
-            <p>Hoteliers</p>
-             <img src="{% static 'assets/img/signature.png' %}" alt="Signature">
-        </div>
+    <div class="signature">
+        <p>Sincerely,</p>
+        <p><strong>Nikhil</strong> - Owner, Hoteliers</p>
+        <img src="{{ signature_path }}" alt="Signature">
     </div>
 </body>
 </html>

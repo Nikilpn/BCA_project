@@ -8,7 +8,7 @@
 </head>
 <body>
 <div class="card">
-                <div class="card-body" style="width:1000px;>
+                <div class="card-body">
                   <h4 class="card-title">Details</h4>
                   <p class="card-description">
                     Details of<code>User</code>
@@ -45,18 +45,15 @@
                             <th>{{d.CHECKIN}}</th>
                             <th>{{d.CHECKOUT}}</th>
                             <th>{{d.TOTALADULTS}}</th>
-                            <th>{{d.TOTALCHILDS}}</th>
                             <th>{{d.SELECTROOM}}</th>
                             <th>{{d.SPECIALREQUEST}}</th>
                             <th>{{d.TOTALPRICE}}</th>
 
                             <td>
-                                 <td>
                                 <a href="{% url 'deletebooked_details' del_id=d.id %}">
                                 <button type="button" class="btn btn-danger">Delete</button>
                                    </a>
                                </td>
-                            </td>
 
 
 

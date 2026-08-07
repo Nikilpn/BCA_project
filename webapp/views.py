@@ -598,11 +598,32 @@ def payment_page(request):
 def generate_pdf(request):
     # Data to pass to the template
     username = request.session.get('USERNAME', 'Guest')
+    data = bookingdb.objects.filter(CUSTOMERNAME=username)
+
+    subtotal = 0
+    tax = 100
+    total = 0
+    for d in data:
+        subtotal = subtotal + (d.TOTALPRICE or 0)
+        if subtotal > 5000:
+            tax = 10
+        else:
+            tax = 20
+        total = subtotal + tax
+
+    # Absolute path to the signature image so xhtml2pdf can embed it
+    import os
+    from django.conf import settings
+    signature_path = os.path.join(settings.BASE_DIR, 'webapp', 'static', 'assets', 'img', 'signature.png')
 
     # Render the template with context
     context = {
         'username': username,
-        'data': 'Your data here',
+        'data': data,
+        'subtotal': subtotal,
+        'total': total,
+        'tax': tax,
+        'signature_path': signature_path,
     }
 
     # Render the HTML template with context data
@@ -610,7 +631,7 @@ def generate_pdf(request):
 
     # Create a PDF
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+    response['Content-Disposition'] = 'attachment; filename="booking_report.pdf"'
 
     # Convert HTML to PDF
     pisa_status = pisa.CreatePDF(html_string, dest=response)
